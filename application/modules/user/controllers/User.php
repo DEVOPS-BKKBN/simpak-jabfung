@@ -32,10 +32,105 @@ class User extends MX_Controller
 			$sql="INSERT INTO pemohon (periode_hid,nip,namalengkap,karpeg,pangkatgol,tmtgol,tmtjab,tempatlahir,tgllahir,jeniskelamin,pendidikan,jabatan,unitkerja,kabkota,kdjab,status,creationdate,createdby)
 					SELECT '".$this->input->post('hid')."' periode,Username,DisplayName,Karpeg,PangkatGol,TmtGol,TmtJab,TempatLahir,TglLahir,JenisKelamin,PendidikanAkhir,Jabatan,BiroName,KdKab,KdJab,'1' Status,NOW(),'".$this->session->userdata('userName')."'
 					FROM users WHERE Username='".$this->session->userdata('userName')."'";
-					echo $sql;
+			//echo $sql;
 			$save=$this->db->query($sql);
+			
+			$insertid=$this->db->insert_id();
+			
+			$this->ReferensiModel->insert_logs($this->session->userdata('userName'),'create','daftar dupak',$insertid,'pemohon');
+                
+				
 			$this->session->set_flashdata('response','<div class="alert alert-success m-t-40">Pendaftaran PAK berhasil. </div>');
 		}
+	}
+	function add_butir(){
+		// data pemohon hid
+		$phid=$this->input->post('phid');
+		$butir=$this->input->post('butir');
+		$jml=$this->input->post('jml');
+		
+		
+		
+		$query=$this->db->get_where('pemohon',array("md5(CONCAT('".TOKEN_DOP."',hid))"=>$phid));
+		$rw=$query->row();
+		if (!empty($rw)){
+			
+			// validasi jenis Nilai atau Prosen
+			
+			$nilai_ak=$this->ReferensiModel->LoadSQL("SELECT jumlah_ak,CASE WHEN jenis='Nilai' THEN jumlah_ak ELSE IFNULL((SELECT ak_kenaikan*jumlah_ak/100 FROM jenjang_jabatan WHERE kode_jab='".$rw->kdjab."'),0) END judul FROM kamus_kegiatan a  WHERE a.hid='$butir'");
+		
+			// cek if exist
+			$hid=$this->ReferensiModel->LoadSQL("SELECT hid judul FROM dupak WHERE pemohon_id='".$rw->hid."' AND kegiatan_id='".$butir."'");
+			$data=array(
+					'pemohon_id'=>$rw->hid,
+					'kegiatan_id'=>$butir,
+					'jml'=>$jml,
+					'nilai_ak'=>$nilai_ak,
+					'total_ak'=>($jml*$nilai_ak),
+					'status'=>0,		
+				);
+			if ($hid==""){
+				$data=array_merge($data,array(
+					'creationdate'=>date("Y-m-d H:i:s"),
+					'createdby'=>$this->session->userdata('userName')));
+				//var_dump($data);
+				$this->ProsesModel->insert_personal($data,'dupak');
+				$insertid=$this->db->insert_id();
+			
+				$this->ReferensiModel->insert_logs($this->session->userdata('userName'),'create','tambah butir',$insertid,'dupak');
+			
+				$this->session->set_flashdata('response', $this->ReferensiModel->showMessage('Sukses menambah data.', 'success'));
+			}else{
+				$data=array_merge($data,array(
+					'updateddate'=>date("Y-m-d H:i:s"),
+					'updatedby'=>$this->session->userdata('userName')));
+				$this->ProsesModel->update_personal($data,$hid,'dupak','hid');
+				$this->ReferensiModel->insert_logs($this->session->userdata('userName'),'update','update butir',$hid,'dupak');
+				$this->session->set_flashdata('response', $this->ReferensiModel->showMessage('Sukses mengupdate data.', 'success'));
+			}
+		}else{
+			$this->session->set_flashdata('response', $this->ReferensiModel->showMessage('Gagal menyimpan data, data tidak ditemukan.', 'danger'));
+		}
+		//var_dump($_POST);
+		redirect(base_url().'user/detildupak?hid='.$phid.'&tab=kegiatan');
+	}
+	function delbutir(){
+		
+		$data=$this->input->post('hid');
+		$this->db->where_in('md5(hid)', $data);
+        $this->db->delete('dupak');
+		$this->session->set_flashdata('response','<div class="alert alert-success m-t-40">Data berhasil dihapus. </div>');
+	}
+	function detilbutir(){
+		$hid=$this->input->get('hid');
+		$query=$this->db->get_where('kamus_kegiatan',array('hid'=>$hid));
+		$rw=$query->row();
+		
+		header('Content-Type: application/json');
+	    echo json_encode($rw);
+	}
+	function carikamus(){
+		
+		// cari detil pemohon
+		$phid=$this->input->get('phid');
+		$query=$this->db->get_where('pemohon',array("md5(CONCAT('".TOKEN_DOP."',hid))"=>$phid));
+		$rwp=$query->row();
+		
+			
+		$q=$this->input->get('q');
+		$kategori=$this->input->get('kategori');
+		$sql="SELECT hid kode,butir_kegiatan nilai,jumlah_ak FROM kamus_kegiatan WHERE kategori='$kategori' AND jabatan_id=(SELECT hid FROM jenjang_jabatan WHERE kode_jab='".$rwp->kdjab."') AND butir_kegiatan LIKE '%$q%' ORDER BY butir_kegiatan";
+		
+		if ($kategori=='Penunjang') $sql="SELECT hid kode,butir_kegiatan nilai,jumlah_ak FROM kamus_kegiatan WHERE kategori='Penunjang' AND jenisjabatan_id=(SELECT jenisjabatan_id FROM jenjang_jabatan WHERE kode_jab='".$rwp->kdjab."') AND kelompok_jabatan IS NULL
+				UNION SELECT hid kode,butir_kegiatan nilai,jumlah_ak FROM kamus_kegiatan WHERE kategori='Penunjang' AND jenisjabatan_id=(SELECT jenisjabatan_id FROM jenjang_jabatan WHERE kode_jab='".$rwp->kdjab."') AND kelompok_jabatan=(SELECT kelompok_jabatan FROM jenjang_jabatan WHERE kode_jab='".$rwp->kdjab."')";
+		$answer=array();	
+		//echo $sql;
+		$query = $this->db->query($sql);
+			foreach ($query->result() as $rw){
+				$answer[] = array("id"=>$rw->kode, "text"=>$rw->nilai.', AK: '.$rw->jumlah_ak);
+			}
+
+		echo json_encode($answer);
 	}
 	function updateProfil(){
 		
@@ -127,6 +222,47 @@ class User extends MX_Controller
 		}
 		redirect('user/profil');
 	}
+	public function kirimdupak(){
+		$sql="SELECT a.*,CONCAT(DATE_FORMAT(startdate,'%d %b %Y'),' s.d ',DATE_FORMAT(enddate,'%d %b %Y')) periode 
+		FROM pemohon a JOIN periode b ON a.periode_hid=b.hid WHERE a.hid='".$this->input->post('hid')."'";
+		//echo $sql;
+		$cn=$this->db->query($sql);
+		$rw=$cn->row();
+		
+		
+		
+		$jenjang=$rw->kdjab;
+		$phid=$rw->hid;
+		$status=$rw->status;
+		
+		//var_dump($rw);
+		
+		//total dokumen administrasi
+		$ttl1=$this->ReferensiModel->LoadSQL("SELECT COUNT(*) judul FROM mdok");
+		
+		// total dokumen yg terisi
+		$ttl2=$this->ReferensiModel->LoadSQL("SELECT COUNT(*) judul FROM dupak a JOIN kamus_dupak b ON a.kegiatan_id=b.kegiatan_hid WHERE pemohon_id='".$rw->hid."' AND total_ak>0");
+		
+		
+		
+		$totaldok=$ttl1+$ttl2;
+		
+			
+		// dokumen sdh terupload
+		$totalup=$this->ReferensiModel->LoadSQL("SELECT COUNT(*)judul FROM dokumen WHERE pemohon_hid='".$rw->hid."'");
+		
+				
+		if ($totaldok==$totalup){
+			echo 'sukses';
+			$sql="UPDATE pemohon SET status='2',updateddate=NOW(),updatedby='".$this->session->userdata('userName')."' WHERE hid='".$this->input->post('hid')."' AND nip='".$this->session->userdata('userName')."'";
+			$save=$this->db->query($sql);
+						
+			$this->ReferensiModel->insert_logs($this->session->userdata('userName'),'create','kirim dupak',$this->input->post('hid'),'pemohon');
+			$this->session->set_flashdata('response','<div class="alert alert-success m-t-40">Data berhasil dikirim ke ADMIN SEKRETARIAT. </div>'); 
+		}else{
+			echo "Dokumen fisik yang diupload belum lengkap.\nDokumen Fisik terupload : ".($totalup*1)." dari ".$totaldok;
+		}
+	}
 	public function simpandupak(){
 		
 		//var_dump($_POST);exit();
@@ -200,17 +336,34 @@ class User extends MX_Controller
 			}
 		
 			$target_dir = 'assets/uploads/dokumen/'.$nip.'/'.$periodehid.'/';
-			$file_name=$nip."_".basename(str_replace(" ","",$_FILES["inputFile"]["name"]));
+			$ext = pathinfo($_FILES["inputFile"]["name"], PATHINFO_EXTENSION);
+			$file_name=$nip."_dokumen_".$this->input->post('dokid').".".$ext;
 			$target_file = $target_dir.$file_name;
 		
 			if (move_uploaded_file($_FILES["inputFile"]["tmp_name"], $target_file)) {
 				
 				// cek if exist
-				$num=$this->ReferensiModel->LoadSQL("SELECT COUNT(*) judul FROM dokumen WHERE pemohon_hid='".$this->input->post('phid')."' AND dupak_hid='".$this->input->post('hid')."' AND dokumen_hid='".$this->input->post('dokid')."' AND jenis='pak'");
-				if ($num<1) $sql="INSERT INTO dokumen (pemohon_hid,dupak_hid,dokumen_hid,dokumen_name,file_name,creationdate,createdby,jenis) VALUES('".$this->input->post('phid')."','".$this->input->post('hid')."','".$this->input->post('dokid')."','".$this->input->post('dokname')."','$file_name',NOW(),'$nip','pak')";
-				else
-				$sql="UPDATE dokumen SET file_name='$file_name',updateddate=NOW(),updatedby='$nip' WHERE pemohon_hid='".$this->input->post('phid')."' AND dupak_hid='".$this->input->post('hid')."' AND dokumen_hid='".$this->input->post('dokid')."'";
-				$save=$this->db->query($sql);
+				$hid=$this->ReferensiModel->LoadSQL("SELECT hid judul FROM dokumen WHERE pemohon_hid='".$this->input->post('phid')."' AND dupak_hid='".$this->input->post('hid')."' AND dokumen_hid='".$this->input->post('dokid')."' AND jenis='pak'");
+				if ($hid=='') {
+					//$sql="INSERT INTO dokumen (pemohon_hid,dupak_hid,dokumen_hid,dokumen_name,file_name,creationdate,createdby,jenis) VALUES('".$this->input->post('phid')."','".$this->input->post('hid')."','".$this->input->post('dokid')."','".$this->input->post('dokname')."','$file_name',NOW(),'$nip','pak')";
+					$data=array(
+						'pemohon_hid'=>$this->input->post('phid'),
+						'dupak_hid'=>$this->input->post('hid'),
+						'dokumen_hid'=>$this->input->post('dokid'),
+						'dokumen_name'=>$this->input->post('dokname'),
+						'file_name'=>$file_name,
+						'creationdate'=>date("Y-m-d H:i:s"),
+						'createdby'=>$nip,
+						'jenis'=>'pak'
+					);
+					$this->ProsesModel->insert_personal($data,'dokumen');
+					$insertid=$this->db->insert_id();
+					$this->ReferensiModel->insert_logs($this->session->userdata('userName'),'create','upload dokumen',$insertid,'dokumen');
+				}else{					
+					$sql="UPDATE dokumen SET file_name='$file_name',updateddate=NOW(),updatedby='$nip' WHERE pemohon_hid='".$this->input->post('phid')."' AND dupak_hid='".$this->input->post('hid')."' AND dokumen_hid='".$this->input->post('dokid')."'";
+					$save=$this->db->query($sql);
+					$this->ReferensiModel->insert_logs($this->session->userdata('userName'),'create','upload dokumen',$hid,'dokumen');
+				}
 				$this->session->set_flashdata('response','<div class="alert alert-success m-t-40">Dokumen berhasil diupload. </div>');  
 			} else {
 				$this->session->set_flashdata('response','<div class="alert alert-danger m-t-40">Dokumen gagal diupload. </div>'); 
@@ -233,7 +386,8 @@ class User extends MX_Controller
 			}
 		
 			$target_dir = 'assets/uploads/dokumen/'.$nip.'/'.$periodehid.'/';
-			$file_name=$nip."_".basename(str_replace(" ","",$_FILES["inputFile"]["name"]));
+			$ext = pathinfo($_FILES["inputFile"]["name"], PATHINFO_EXTENSION);
+			$file_name=$nip."_pribadi_".$this->input->post('dokid').".".$ext;
 			$target_file = $target_dir.$file_name;
 		
 			if (move_uploaded_file($_FILES["inputFile"]["tmp_name"], $target_file)) {

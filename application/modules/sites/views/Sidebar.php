@@ -7,7 +7,9 @@
 							<?php
 								// jika level user user ambil dari simsdm
 								
-								if ($this->session->userdata('leveluser')=='') echo '<img src="'.URL_FOTO_SIMSDM.'/'.$this->session->userdata('foto').'" alt="..." class="avatar-img rounded-circle">';
+								
+								
+								if ($this->session->userdata('leveluser')=='' || $this->session->userdata('leveluser')=='3') echo '<img src="'.URL_FOTO_SIMSDM.'/'.$this->session->userdata('foto').'" alt="..." class="avatar-img rounded-circle">';
 								else {
 									if ($this->session->userdata('foto')=='')
 										echo '<img src="'.base_url().'assets/img/profile.jpg" class="avatar-img rounded-circle">';
@@ -79,14 +81,41 @@
 							
 						</li>
 					<?php } ?>
+					<?php if ($this->session->userdata('leveluser')=='3'){ 
+						// baca num dupak penilaian belum di proses
+						$sql="SELECT COUNT(*) judul FROM pemohon WHERE status='3' AND penilaiandate IS NULL AND penilai_id=(SELECT hid FROM penilai WHERE nip='".$this->session->userdata('userName')."')";
+						$num=$this->ReferensiModel->LoadSQL($sql);
+					?>
+						<li class="nav-item submenu <?php if ($urlmenu=='penilaian' || $urlmenu=='ongoing' || $urlmenu=='finish') echo 'active'; ?>">
+							<a data-toggle="collapse" href="#sidebarLayouts" class="" >
+								<i class="fas fa-chalkboard-teacher"></i>
+								<p>Penilai</p><span class="badge badge-danger"><?php echo $num; ?></span>
+								<span class="caret"></span>
+							</a>
+							<div class="collapse <?php if ($urlmenu=='penilaian' || $urlmenu=='ongoing' || $urlmenu=='finish') echo 'show'; ?>" id="sidebarLayouts">
+								<ul class="nav nav-collapse">
+									<li>
+										<a href="<?php echo base_url(); ?>penilai/ongoing">
+											<span class="sub-item">Penilaian dalam proses</span>
+										</a>
+									</li>
+									<li>
+										<a href="<?php echo base_url(); ?>penilai/finish">
+											<span class="sub-item">Penilaian selesai</span>
+										</a>
+									</li>
+								</ul>
+							</div>
+						</li>
+					<?php } ?>
 					<?php if ($this->session->userdata('leveluser')=='1'){ ?>
-						<li class="nav-item submenu <?php if ($urlmenu=='users' || $urlmenu=='kamus' || $urlmenu=='jenjang' || $urlmenu=='jabatan' || $urlmenu=='kelompok' || $urlmenu=='listkelompok') echo 'active'; ?>">
+						<li class="nav-item submenu <?php if ($urlmenu=='users' || $urlmenu=='kamus' || $urlmenu=='jenisjabatan' || $urlmenu=='jabatan' || $urlmenu=='kelompok' || $urlmenu=='listkelompok'|| $urlmenu=='pejabatjf') echo 'active'; ?>">
 							<a data-toggle="collapse" href="#sidebarLayouts" class="" >
 								<i class="fas fa-th-list"></i>
 								<p>Master</p>
 								<span class="caret"></span>
 							</a>
-							<div class="collapse <?php if ($urlmenu=='users' || $urlmenu=='kamus' || $urlmenu=='jenjang' || $urlmenu=='jabatan' || $urlmenu=='kelompok' || $urlmenu=='listkelompok') echo 'show'; ?>" id="sidebarLayouts">
+							<div class="collapse <?php if ($urlmenu=='users' || $urlmenu=='kamus' || $urlmenu=='jenisjabatan' || $urlmenu=='jabatan' || $urlmenu=='kelompok' || $urlmenu=='listkelompok'|| $urlmenu=='pejabatjf') echo 'show'; ?>" id="sidebarLayouts">
 								<ul class="nav nav-collapse">
 									<li>
 										<a href="<?php echo base_url(); ?>master/users">
@@ -94,35 +123,35 @@
 										</a>
 									</li>
 									<li>
-										<a href="<?php echo base_url(); ?>master/jenjang">
-											<span class="sub-item">Jenjang Jabatan</span>
+										<a href="<?php echo base_url(); ?>master/jenisjabatan">
+											<span class="sub-item">Jenis Jabatan</span>
 										</a>
 									</li>
 									<li>
 										<a href="<?php echo base_url(); ?>master/jabatan">
-											<span class="sub-item">Jabatan</span>
+											<span class="sub-item">Jabatan Fungsional</span>
 										</a>
 									</li>
 									<li>
-										<a href="<?php echo base_url(); ?>master/kelompok">
-											<span class="sub-item">Kelompok Jabatan</span>
+										<a href="<?php echo base_url(); ?>master/pejabatjf">
+											<span class="sub-item">Pejabat Fungsional</span>
 										</a>
 									</li>									
 									<li>
 										<a href="<?php echo base_url(); ?>master/kamus">
-											<span class="sub-item">Butir AK</span>
+											<span class="sub-item">Butir Angka Kredit</span>
 										</a>
 									</li>
 								</ul>
 							</div>
 						</li>
-						<li class="nav-item submenu <?php if ($urlmenu=='periode' || $urlmenu=='penilai'  || $urlmenu=='nilaipak' || $urlmenu=='jadwal') echo 'active'; ?>">
+						<li class="nav-item submenu <?php if ($urlmenu=='dtlpleno' || $urlmenu=='periode' || $urlmenu=='penilai'  || $urlmenu=='bap' || $urlmenu=='pleno' || $urlmenu=='distribusi' || $urlmenu=='dtldistribusi') echo 'active'; ?>">
 							<a data-toggle="collapse" href="#forms" class="">
 								<i class="fas fa-pen-square"></i>
 								<p>Penilaian</p>
 								<span class="caret"></span>
 							</a>
-							<div class="collapse <?php if ($urlmenu=='periode' || $urlmenu=='penilai'  || $urlmenu=='nilaipak' || $urlmenu=='jadwal') echo 'show'; ?>" id="forms">
+							<div class="collapse <?php if ($urlmenu=='dtlpleno' || $urlmenu=='periode' || $urlmenu=='penilai'  || $urlmenu=='bap' || $urlmenu=='pleno' || $urlmenu=='distribusi' || $urlmenu=='dtldistribusi') echo 'show'; ?>" id="forms">
 								<ul class="nav nav-collapse">
 									<li>
 										<a href="<?php echo base_url(); ?>penilaian/periode">
@@ -135,13 +164,18 @@
 										</a>
 									</li>
 									<li>
-										<a href="<?php echo base_url(); ?>penilaian/jadwal">
+										<a href="<?php echo base_url(); ?>penilaian/distribusi">
+											<span class="sub-item">Distribusi Penilaian</span>
+										</a>
+									</li>
+									<li>
+										<a href="<?php echo base_url(); ?>penilaian/pleno">
 											<span class="sub-item">Jadwal Pleno</span>
 										</a>
 									</li>
 									<li>
-										<a href="<?php echo base_url(); ?>penilaian/nilaipak">
-											<span class="sub-item">Nilai PAK</span>
+										<a href="<?php echo base_url(); ?>penilaian/bap">
+											<span class="sub-item">BAP</span>
 										</a>
 									</li>
 								</ul>

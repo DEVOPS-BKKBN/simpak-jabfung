@@ -246,7 +246,7 @@ class ReferensiModel extends CI_Model {
 	 public function insert_logs($iduser,$crud,$action,$idaction,$tablename){
 		$ip = $_SERVER['REMOTE_ADDR'];
 		$data = array( 
-            'id_user'=> $iduser,
+            'username'=> $iduser,
 			'CRUD'=> $crud,
 			'created_at' => date('Y-m-d H:i:s'),
 			'action'=> $action,
@@ -256,9 +256,10 @@ class ReferensiModel extends CI_Model {
 		if ($idaction!=''){
 			$data=array_merge($data,array('id_action' =>$idaction));
 		} 
-		$this->insert_referensi($data,'action_log');   	
+		$this->insert_referensi($data,'logs');   	
 		 
 	 }	
+	 
 	function calWorkingDay($tgl1,$tgl2, $holidays = array()){
 		$holidaysx=array();
 		foreach ($holidays as  $holiday) {
@@ -292,10 +293,10 @@ class ReferensiModel extends CI_Model {
 		if ($id==0) $status='Draft';
 		elseif($id==1) $status='Terdaftar';
 		elseif($id==2) $status='Kirim ke Sekretariat';
-		elseif($id==3) $status='Seleksi';
+		elseif($id==3) $status='Sudah ada Penilai';
 		elseif($id==4) $status='Sudah Dinilai';
-		elseif($id==5) $status='Selesai';
-		elseif($id==6) $status='Tidak Lolos Seleksi';
+		elseif($id==5) $status='Masuk Pleno';
+		elseif($id==6) $status='Sudah Tanda Tangan';
 		else $status='';
 		return $status;
 	}

@@ -33,13 +33,15 @@
                                                     <th scope="col">Kode Jab</th>
                                                     <th scope="col">Jabatan</th>
 													<th scope="col">Jenis Jabatan</th>
+													<th scope="col">Kelompok Jabatan</th>
+													<th scope="col">AK Kenaikan</th>
                                                     <th>Aksi</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
                                              <?php
                                                 $n = 0;
-                                                $sql="SELECT * FROM jabatan";
+                                                $sql="SELECT a.*,b.jenis_jabatan FROM jenjang_jabatan a LEFT JOIN jenis_jabatan b ON a.jenisjabatan_id=b.hid WHERE a.deleted_at IS NULL";
 							                    $cn = $this->db->query($sql);
                                                 foreach ($cn->result() as $rw) {
                                                     $n++;
@@ -47,7 +49,9 @@
                                                     echo '<td>' . $n . '</td>';
                                                     echo '<td>'.$rw->kode_jab.'</td>';
                                                     echo '<td>'.$rw->jabatan.'</td>';
-													echo '<td>'.$rw->jenis_jab.'</td>';
+													echo '<td>'.$rw->jenis_jabatan.'</td>';
+													echo '<td>'.$rw->kelompok_jabatan.'</td>';
+													echo '<td>'.$rw->ak_kenaikan.'</td>';
                                                     echo '<td><div class="form-button-action">';
                                                     echo '<a href="' . base_url() . 'master/modal?hid=' . $rw->hid . '&action=' . $action . '" class="btn btn-link btn-primary btn-lg ls-modal"><i class="fa fa-edit"></i></a>';
                                                     echo '<a href="" class="btn btn-link btn-danger del" data-id="' . md5($rw->hid). '"><i class="fa fa-trash"></a>';

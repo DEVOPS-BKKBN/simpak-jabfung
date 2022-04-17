@@ -6,6 +6,7 @@ class Dashboard extends MX_Controller
   {
       parent::__construct();
       $this->load->model('login/UserModel');
+	  $this->load->model('login/ReferensiModel');
       if( !$this->session->userdata('isLoggedIn') ) {
          redirect(base_url().'login/show_login');
       }

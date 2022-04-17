@@ -13,15 +13,8 @@
                         <div class="col-md-12">
                             <div class="card">
                                 <div class="card-header">
-                                    <h4 class="card-title">Jenis Jabatan</h4>
-                                    <div class="d-flex align-items-left align-items-md-center flex-column flex-md-row">
-                                        <div class="ml-md-auto py-2 py-md-0">
-                                            <a href="<?php echo base_url(); ?>master/modal?action=<?php echo $action; ?>" class="btn btn-secondary btn-round ls-modal">
-                                                <span class="btn-label">
-                                                    <i class="fa fa-plus"></i>
-                                                </span> Tambah</a>
-                                        </div>
-                                    </div>
+                                    <h4 class="card-title">Daftar Pejabat Fungsional</h4>
+									<div class="card-category">Link otomatis ke SIMSDM</div>
                                 </div>
 
                                 <div class="card-body">
@@ -30,26 +23,69 @@
                                             <thead>
                                                 <tr>
                                                     <th>No</th>
-                                                    <th scope="col">Jenis Jabatan</th>
-													<th>Aksi</th>
+                                                    <th scope="col">NIP</th>
+													<th scope="col">Nama</th>
+													<th scope="col">Jabatan</th>
+													<th scope="col">TMT Jab</th>
+													<th scope="col">Pangkat/Golongan</th>
+													<th scope="col">TMT Gol</th>
+													<th scope="col">Unit Kerja</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 <?php
+												$urlapi=URL_SIMSDM."index.php/ProsesController/daftarPegawaiFungsional";											
+												$data = array("token" => TOKEN_SIMSDM);                                                                    
+												$post = json_encode($data);       
+																					
+												$ch = curl_init();
+												curl_setopt($ch, CURLOPT_URL,$urlapi);
+												curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");                                                                     
+												curl_setopt($ch, CURLOPT_POSTFIELDS, $post);                                                                  
+												curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);                                                                      
+												curl_setopt($ch, CURLOPT_HTTPHEADER, array(                                                                          
+													'Content-Type: application/json',                                                                                
+													'Content-Length: ' . strlen($post))                                                                       
+												);    
+																					
+												curl_setopt($ch, CURLOPT_RETURNTRANSFER,1);
+												$result=curl_exec ($ch);
+												
+												curl_close ($ch);
+																					
+												$json = json_decode($result, true);
+												
+												if(!empty($json)){
+													$n = 0;
+													foreach($json as $key => $value) {
+														//var_dump($value);
+														$n++;
+														echo '<tr>';
+														echo '<td>' . $n . '</td>';
+														echo '<td>'.$value['NIP'].'</td>';
+														echo '<td>'.$value['namalengkap'].'</td>';
+														echo '<td>'.$value['jabatan'].'</td>';
+														echo '<td>'.$this->ReferensiModel->YMDtoDMY($value['tmtjab']).'</td>';
+														if (!empty($value['pangkat'])) echo '<td>'.$value['pangkat'].' ('.$value['golongan'].')</td>';
+															else echo '<td></td>';
+														echo '<td>'.$this->ReferensiModel->YMDtoDMY($value['tmtgol']).'</td>';
+														echo '<td>'.$value['bironame'].'</td>';
+														echo '</tr>';
+													}
+												}
+				
+												/*
                                                 $n = 0;
-                                                $sql="SELECT * FROM jenis_jabatan WHERE deleted_at IS NULL";
+                                                $sql="SELECT * FROM jenjang";
 							                    $cn = $this->db->query($sql);
                                                 foreach ($cn->result() as $rw) {
                                                     $n++;
                                                     echo '<tr>';
                                                     echo '<td>' . $n . '</td>';
-                                                    echo '<td>'.$rw->jenis_jabatan.'</td>';
-                                                    echo '<td><div class="form-button-action">';
-                                                    echo '<a href="' . base_url() . 'master/modal?hid=' . $rw->hid . '&action=' . $action . '" class="btn btn-link btn-primary btn-lg ls-modal"><i class="fa fa-edit"></i></a>';
-                                                    echo '<a href="" class="btn btn-link btn-danger del" data-id="' . md5($rw->hid). '"><i class="fa fa-trash"></a>';
-                                                    echo '</div></td>';
+                                                    echo '<td>'.$rw->jenjang.'</td>';
                                                     echo '</tr>';
                                                 }
+												*/
                                                 ?>
                                             </tbody>
                                         </table>

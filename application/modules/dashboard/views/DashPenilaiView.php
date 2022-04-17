@@ -4,11 +4,7 @@
 						<div class="d-flex align-items-left align-items-md-center flex-column flex-md-row">
 							<div>
 								<h2 class="text-white pb-2 fw-bold">Dashboard</h2>
-								<h5 class="text-white op-7 mb-2">Dashboard Tim Sekretariat</h5>
-							</div>
-							<div class="ml-md-auto py-2 py-md-0">
-								<a href="<?php echo base_url();?>penilaian/penilai" class="btn btn-white btn-border btn-round mr-2">Tim Penilai</a>
-								<a href="<?php echo base_url();?>master/modal?action=users" class="btn btn-secondary btn-round ls-modal">Add User</a>
+								<h5 class="text-white op-7 mb-2">Dashboard Penilai</h5>
 							</div>
 						</div>
 					</div>

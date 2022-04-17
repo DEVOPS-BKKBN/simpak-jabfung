@@ -72,14 +72,14 @@ class ProsesModel extends CI_Model {
 			$this->ProsesModel->insert_personal($data,'notifikasi');
 	   }
 	   public function NilaiTotalPAK($hid){
-			$sql="SELECT ROUND(SUM(total_ak),3) judul FROM dupak a JOIN kamus_kegiatan b ON a.kegiatan_id=b.hid WHERE pemohon_id='$hid' AND isnilai='1'";
+			$sql="SELECT ROUND(SUM(total_ak),3) judul FROM dupak a JOIN kamus_kegiatan b ON a.kegiatan_id=b.hid WHERE pemohon_id='$hid'";
 			$cn=$this->db->query($sql);
 			$rw=$cn->row_array();
 			
 			return $rw['judul'];
 	   }
 	   public function NilaiTotalPAKFinal($hid){
-			$sql="SELECT ROUND(SUM(total_ak_penilai),3) judul FROM dupak a JOIN kamus_kegiatan b ON a.kegiatan_id=b.hid WHERE pemohon_id='$hid' AND isnilai='1'";
+			$sql="SELECT ROUND(SUM(total_ak_penilai),3) judul FROM dupak a JOIN kamus_kegiatan b ON a.kegiatan_id=b.hid WHERE pemohon_id='$hid'";
 			$cn=$this->db->query($sql);
 			$rw=$cn->row_array();
 			

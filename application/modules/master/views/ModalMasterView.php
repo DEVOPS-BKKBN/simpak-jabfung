@@ -105,6 +105,31 @@ $rw = $query->row();
     });
 </script>
 <?php } ?>
+<?php if ($action=='dokumen'){?>
+<form method="post" class="form-material" name="formmst" id="formmst" action="<?php echo base_url(); ?>master/add_dokumen">
+<input type="hidden" name="hid" value="<?php echo $hid; ?>"/>
+<input type="hidden" name="jabatan" value="<?php echo $this->input->get('jabatan'); ?>"/>
+<input type="hidden" name="jenisjab" value="<?php echo $this->input->get('jenisjab'); ?>"/>
+<div class="modal-header">
+	<h4 class="modal-title" id="myLargeModalLabel">Master Dokumen Fisik</h4>
+	<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+</div>
+<div class="modal-body">
+	<div class="row">
+		<div class="col-md-12">
+			<div class="form-group">
+				<label>Nama Dokumen</label>
+				<input type="text" name="nama" class="form-control" value="<?php if (!empty($rw)) echo $rw['Judul']; ?>" required> 
+			</div>
+		</div>
+	</div>
+</div>
+<div class="modal-footer">
+	<button type="button" class="btn btn-danger waves-effect text-left" data-dismiss="modal">Tutup</button>
+	<button type="submit" class="btn btn-primary waves-effect text-left">Simpan</button>
+</div>
+</form>
+<?php } ?>
 <?php if ($action == 'kamus') {
 
 $query = $this->db->get_where('kamus_kegiatan', array('hid' => $hid));
@@ -119,33 +144,98 @@ $rw = $query->row();
         <button type="button" class="close" data-dismiss="modal">&times;</button>
     </div>
 
-    <div class="modal-body">
+    <div class="modal-body" style="max-height:500px;overflow-y:auto">
         <div class="row">
-            <div class="col-md-12 group">
-                <div class="form-group">
-                    <label for="nama">Kegiatan</label>
-                    <textarea class="form-control" id="nama" name="nama" required><?php if (!empty($rw)) echo $rw->uraian_kegiatan; ?></textarea>
-                    
-                </div>
-            </div>           
-            <div class="col-md-12 group">
+			<div class="col-md-4 group">
                 <div class="form-group">
                     <label for="kategori">Kategori</label>
                     <?php
                         if (!empty($rw)) $status=$rw->kategori; else $status="";
                         $list=array('Utama','Penunjang');
                         $list2=array('1','2');
-                        echo $this->ReferensiModel->LoadList($list,$list,'kategori',$status,'class="form-control custom-select" required','');
+                        echo $this->ReferensiModel->LoadList($list,$list,'kategori',$status,'class="form-control" required','');
+                    ?>
+                </div>
+            </div>
+			<div class="col-md-8 group">
+                <div class="form-group">
+                    <label for="kategori">Unsur Kegiatan</label>
+                    <?php
+                        if (!empty($rw)) $status=$rw->unsur_kegiatan; else $status="";
+                        $sql="SELECT DISTINCT  unsur_kegiatan kode,unsur_kegiatan nilai FROM kamus_kegiatan WHERE deleted_at IS NULL ORDER BY unsur_kegiatan";
+                        echo $this->ReferensiModel->LoadListMaster($sql,'unsur',$status,'class="form-control" required','');
                     ?>
                 </div>
             </div>
 			<div class="col-md-12 group">
                 <div class="form-group">
-                    <label for="kategori">Kelompok Jabatan</label>
+                    <label for="kategori">Sub Unsur Kegiatan</label>
                     <?php
-                        if (!empty($rw)) $status=$rw->kelompok_id; else $status="";
-                        $sql="SELECT hid kode, kelompok nilai FROM kelompok ORDER BY kelompok";
-                        echo $this->ReferensiModel->LoadListMaster($sql,'kelompok',$status,'class="form-control custom-select" required','');
+                        if (!empty($rw)) $status=$rw->subunsur_kegiatan; else $status="";
+                        $sql="SELECT DISTINCT  subunsur_kegiatan kode,subunsur_kegiatan nilai FROM kamus_kegiatan WHERE deleted_at IS NULL ORDER BY subunsur_kegiatan";
+                        echo $this->ReferensiModel->LoadListMaster($sql,'subunsur',$status,'class="form-control" required','');
+                    ?>
+                </div>
+            </div>
+			
+            <div class="col-md-12 group">
+                <div class="form-group">
+                    <label for="nama">Kegiatan</label>
+                    <textarea class="form-control" id="nama" name="nama" required><?php if (!empty($rw)) echo $rw->butir_kegiatan; ?></textarea>
+                    
+                </div>
+            </div>      
+			<div class="col-md-6 group">
+                <div class="form-group">
+                    <label for="nama">Output</label>
+                    <input type="text" class="form-control" id="output" name="output" value="<?php if (!empty($rw)) echo $rw->output; ?>" required>
+                    
+                </div>
+            </div>
+			<div class="col-md-3 group">
+                <div class="form-group">
+                    <label for="kategori">Jenis</label>
+                    <?php
+                        if (!empty($rw)) $status=$rw->jenis; else $status="";
+                        $list=array('Nilai','Prosen');
+                        echo $this->ReferensiModel->LoadList($list,$list,'jenisak',$status,'class="form-control" required','');
+                    ?>
+                </div>
+            </div>
+			<div class="col-md-3 group">
+                <div class="form-group">
+                    <label for="nama">Angka Kredit</label>
+                    <input type="text" class="form-control" id="ak" name="ak" value="<?php if (!empty($rw)) echo $rw->jumlah_ak; ?>" required>
+                    
+                </div>
+            </div>
+			<div class="col-md-4 group">
+                <div class="form-group">
+                    <label for="kategori">Jenis Jabatan</label>
+                    <?php
+                        if (!empty($rw)) $status=$rw->jenisjabatan_id; else $status="";
+                        $sql="SELECT hid kode, jenis_jabatan nilai FROM jenis_jabatan ORDER BY jenis_jabatan";
+                        echo $this->ReferensiModel->LoadListMaster($sql,'jjab',$status,'class="form-control custom-select" required','');
+                    ?>
+                </div>
+            </div>
+			<div class="col-md-8">
+				<div class="form-group">
+				<label for="defaultSelect">Kelompok Jabatan <small>(* kosongkan jika untuk semua kelompok jabatan)</small></label>
+				<?php
+												
+					$list=array('Ahli','Terampil');
+					echo $this->ReferensiModel->LoadList($list,$list,'kelompok',$this->input->get('kelompok'),'class="form-control"','');
+				?>
+				</div>
+			</div>
+			<div class="col-md-12 group">
+                <div class="form-group">
+                    <label for="kategori">Jabatan Fungsional <small>(* kosongkan jika untuk semua jenjang)</small></label>
+                    <?php
+                        if (!empty($rw)) $status=$rw->jabatan_id; else $status="";
+                        $sql="SELECT hid kode, CONCAT(kode_jab,'-',jabatan) nilai FROM jabatan ORDER BY jabatan";
+                        echo $this->ReferensiModel->LoadListMaster($sql,'mjabatan',$status,'class="form-control custom-select"','');
                     ?>
                 </div>
             </div>
@@ -159,8 +249,14 @@ $rw = $query->row();
     </div>
 </form>
 <script>
-    $('#kecamatan').select2({
-        'width': '100%'
+    $('#mjabatan').select2({
+        'width': '100%',
+		'dropdownParent': $("#largeModal")
+    });
+	$('#unsur,#subunsur').select2({
+        'width': '100%',
+		tags:true,
+		'dropdownParent': $("#largeModal")
     });
     $('#formmodal').validate({
         rules: {
@@ -189,7 +285,7 @@ $rw = $query->row();
     <input type="hidden" name="hid" value="<?php echo $hid; ?>" />
     <input type="hidden" name="action" value="<?php echo $action; ?>" />
     <div class="modal-header">
-        <h4 class="modal-title">User</h4>
+        <h4 class="modal-title">Jenis Jabatan</h4>
         <button type="button" class="close" data-dismiss="modal">&times;</button>
     </div>
 
@@ -197,7 +293,7 @@ $rw = $query->row();
         <div class="row">
             <div class="col-md-12 group">
                 <div class="form-group">
-                    <label for="nama">Jenjang Jabatan</label>
+                    <label for="nama">Jenis Jabatan</label>
                     <input type="text" class="form-control" id="nama" name="nama" required value="<?php if (!empty($rw)) echo $rw->jenjang; ?>"/>
                     
                 </div>
@@ -233,7 +329,7 @@ $rw = $query->row();
 <?php } ?>
 <?php if ($action == 'jabatan') {
 
-$query = $this->db->get_where('jabatan', array('hid' => $hid));
+$query = $this->db->get_where('jenjang_jabatan', array('hid' => $hid));
 $rw = $query->row();
 
 ?>
@@ -247,28 +343,45 @@ $rw = $query->row();
 
     <div class="modal-body">
         <div class="row">
-			<div class="col-md-12 group">
+			<div class="col-md-4 group">
                 <div class="form-group">
                     <label for="nama">Kode Jabatan</label>
                     <input type="text" class="form-control" id="kdjab" name="kdjab" required value="<?php if (!empty($rw)) echo $rw->kode_jab; ?>"/>
                     
                 </div>
             </div>
-            <div class="col-md-12 group">
+            <div class="col-md-8 group">
                 <div class="form-group">
                     <label for="nama">Jabatan</label>
                     <input type="text" class="form-control" id="nama" name="nama" required value="<?php if (!empty($rw)) echo $rw->jabatan; ?>"/>
                     
                 </div>
             </div>
-			<div class="col-md-12 group">
+			<div class="col-md-8 group">
                 <div class="form-group">
                     <label for="kategori">Jenis Jabatan</label>
                     <?php
-                        if (!empty($rw)) $status=$rw->jenis_jab; else $status="";
-                        $list=array('FT','FU');
-                        echo $this->ReferensiModel->LoadList($list,$list,'jjab',$status,'class="form-control custom-select" required','');
+                        if (!empty($rw)) $status=$rw->jenisjabatan_id; else $status="";
+                        $sql="SELECT hid kode, jenis_jabatan nilai FROM jenis_jabatan ORDER BY jenis_jabatan";
+                        echo $this->ReferensiModel->LoadListMaster($sql,'jjabatan',$status,'class="form-control" required','');
                     ?>
+                </div>
+            </div>
+			<div class="col-md-4 group">
+                <div class="form-group">
+                    <label for="kategori">Kelompok Jabatan</label>
+                    <?php
+                        if (!empty($rw)) $status=$rw->kelompok_jabatan; else $status="";
+                        $list=array('Ahli','Terampil');
+                        echo $this->ReferensiModel->LoadList($list,$list,'kelompok',$status,'class="form-control" required','');
+                    ?>
+                </div>
+            </div>
+			<div class="col-md-4 group">
+                <div class="form-group">
+                    <label for="nama">AK Kenaikan</label>
+                    <input type="number" class="form-control" id="ak" name="ak" required value="<?php if (!empty($rw)) echo $rw->ak_kenaikan; ?>"/>
+                    
                 </div>
             </div>
 

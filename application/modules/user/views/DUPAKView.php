@@ -42,7 +42,7 @@
 																WHEN 4 THEN 'Sudah Dinilai'
 																WHEN 5 THEN 'Selesai'
 																ELSE ''
-															END status,b.hid hiddupak,DATE_FORMAT(b.creationdate,'%d %b %Y %H:%i') tgldaftar
+															END status,b.hid hiddupak,DATE_FORMAT(b.creationdate,'%d %b %Y %H:%i') tgldaftar,b.status statusdupak
 														FROM periode a LEFT JOIN pemohon b ON a.hid=b.periode_hid WHERE a.status='1' AND b.nip='".$this->session->userdata('userName')."'";
 												$pangkat = $this->db->query($sql);
 												foreach ($pangkat->result() as $rw){
@@ -53,7 +53,7 @@
 													echo '<td>'.$rw->tgldaftar.'</td>';
 													echo '<td>'.$rw->periode.'</td>';
 													echo '<td>'.$this->ProsesModel->NilaiTotalPAK($rw->hiddupak).'</td>';
-													echo '<td>'.$rw->status.'</td>';
+													echo '<td>'.$this->ReferensiModel->StatusDUPAK($rw->statusdupak).'</td>';
 													echo '<td>';
 													echo '<a href="'.base_url().'user/detildupak?hid='.md5(TOKEN_DOP.$rw->hiddupak).'" class="mr-2" title="Detil"><i class="icon-note fa-2x"></i></a>';
 													echo '<a href="'.base_url().'user/cetakpak?hid='.md5(TOKEN_DOP.$rw->hiddupak).'" title="Download" target="_blank"><i class="icon-cloud-download fa-2x"></a>';

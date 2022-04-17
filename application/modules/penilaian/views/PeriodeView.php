@@ -44,7 +44,7 @@
                                                 <?php
                                                 $n = 0;
                                                 $sql="SELECT a.*,CASE WHEN dataisi>0 THEN dataisi+(nomor_awal-1) ELSE nomor_awal END nomor_akhir FROM (SELECT format_nomor,hid,namaperiode,CONCAT(DATE_FORMAT(startdate,'%b %Y'),' s.d ',DATE_FORMAT(enddate,'%b %Y')) periode,CASE WHEN status='0' THEN 'Tidak Aktif' ELSE 'Aktif' END status,nomor_awal,
-							(SELECT COUNT(*) ttl FROM pemohon WHERE status NOT IN(1,2,6) AND periode_hid=a.hid) dataisi,kota_pak,pejabat_pak FROM periode a ORDER BY startdate ASC ) a";
+							(SELECT COUNT(*) ttl FROM pemohon WHERE status NOT IN(1,2,6) AND periode_hid=a.hid) dataisi,kota_pak,pejabat_pak FROM periode a WHERE  	deleted_at  IS NULL ORDER BY startdate ASC ) a";
                                                 
 							                    $cn = $this->db->query($sql);
                                                 foreach ($cn->result_array() as $rw) {

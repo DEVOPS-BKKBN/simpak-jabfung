@@ -7,6 +7,7 @@
 		<div class="main-panel">
 		<?php 
 			if ($this->session->userdata('leveluser')=='1') $this->load->view('DashAdminView');
+			if ($this->session->userdata('leveluser')=='3') $this->load->view('DashPenilaiView');
 			if ($this->session->userdata('leveluser')=='') $this->load->view('DashUserView');
 		
 		?>

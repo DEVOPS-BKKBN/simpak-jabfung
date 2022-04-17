@@ -13,15 +13,7 @@
                         <div class="col-md-12">
                             <div class="card">
                                 <div class="card-header">
-                                    <h4 class="card-title">Jenis Jabatan</h4>
-                                    <div class="d-flex align-items-left align-items-md-center flex-column flex-md-row">
-                                        <div class="ml-md-auto py-2 py-md-0">
-                                            <a href="<?php echo base_url(); ?>master/modal?action=<?php echo $action; ?>" class="btn btn-secondary btn-round ls-modal">
-                                                <span class="btn-label">
-                                                    <i class="fa fa-plus"></i>
-                                                </span> Tambah</a>
-                                        </div>
-                                    </div>
+                                    <h4 class="card-title">Distribusi Penilaian</h4>
                                 </div>
 
                                 <div class="card-body">
@@ -30,27 +22,46 @@
                                             <thead>
                                                 <tr>
                                                     <th>No</th>
-                                                    <th scope="col">Jenis Jabatan</th>
-													<th>Aksi</th>
+                                                    <th scope="col">Periode Penilaian</th>
+													<th scope="col"># Kandidat</th>
+													<th scope="col"># Belum Ada Penilai</th>
+													<th scope="col"># Sudah Ada Penilai</th>
+													<th scope="col"># Belum Dinilai</th>
+													<th scope="col"># Sudah Dinilai</th>
+													<th scope="col"># Selesai</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <?php
-                                                $n = 0;
-                                                $sql="SELECT * FROM jenis_jabatan WHERE deleted_at IS NULL";
-							                    $cn = $this->db->query($sql);
-                                                foreach ($cn->result() as $rw) {
-                                                    $n++;
-                                                    echo '<tr>';
-                                                    echo '<td>' . $n . '</td>';
-                                                    echo '<td>'.$rw->jenis_jabatan.'</td>';
-                                                    echo '<td><div class="form-button-action">';
-                                                    echo '<a href="' . base_url() . 'master/modal?hid=' . $rw->hid . '&action=' . $action . '" class="btn btn-link btn-primary btn-lg ls-modal"><i class="fa fa-edit"></i></a>';
-                                                    echo '<a href="" class="btn btn-link btn-danger del" data-id="' . md5($rw->hid). '"><i class="fa fa-trash"></a>';
-                                                    echo '</div></td>';
-                                                    echo '</tr>';
-                                                }
-                                                ?>
+                                            <?php
+												$n=0;
+
+												$sql="SELECT hid,namaperiode,
+														(SELECT COUNT(*) FROM pemohon WHERE periode_hid=a.hid AND status IN(2,3,4,5)) jmlpeserta,
+														(SELECT COUNT(*) FROM pemohon WHERE periode_hid=a.hid AND status IN(2,3,4,5) AND penilai_id IS NOT NULL AND penilaiandate IS NOT NULL) sdhdinilai,
+														(SELECT COUNT(*) FROM pemohon WHERE periode_hid=a.hid AND status IN(2,3,4,5) AND penilai_id IS NOT NULL AND penilaiandate IS NULL) blmdinilai,
+														(SELECT COUNT(*) FROM pemohon WHERE periode_hid=a.hid AND status='5') selesai,
+														(SELECT COUNT(*) FROM pemohon WHERE periode_hid=a.hid AND status IN(2,3,4,5) AND penilai_id IS NOT NULL) ada,
+														(SELECT COUNT(*) FROM pemohon WHERE periode_hid=a.hid AND status IN(2,3,4,5) AND penilai_id IS NULL) belum
+														 FROM periode a WHERE status='1'";
+												$pangkat = $this->db->query($sql);
+												foreach ($pangkat->result() as $rw){
+													
+													$n++;
+													echo '<tr>';
+													echo '<td>'.$n.'</td>';
+													echo '<td>'.$rw->namaperiode.'</td>';
+													echo '<td><a href="'.base_url().'penilaian/dtldistribusi?phid='.md5(TOKEN_DOP.$rw->hid).'&jenis=peserta">'.$rw->jmlpeserta.'</a></td>';
+													echo '<td><a href="'.base_url().'penilaian/dtldistribusi?phid='.md5(TOKEN_DOP.$rw->hid).'&jenis=belum">'.$rw->belum.'</a></td>';
+													echo '<td><a href="'.base_url().'penilaian/dtldistribusi?phid='.md5(TOKEN_DOP.$rw->hid).'&jenis=ada">'.$rw->ada.'</a></td>';
+													echo '<td><a href="'.base_url().'penilaian/dtldistribusi?phid='.md5(TOKEN_DOP.$rw->hid).'&jenis=blmdinilai">'.$rw->blmdinilai.'</a></td>';
+													echo '<td><a href="'.base_url().'penilaian/dtldistribusi?phid='.md5(TOKEN_DOP.$rw->hid).'&jenis=sdhdinilai">'.$rw->sdhdinilai.'</a></td>';
+													echo '<td><a href="'.base_url().'penilaian/dtldistribusi?phid='.md5(TOKEN_DOP.$rw->hid).'&jenis=selesai">'.$rw->selesai.'</a></td>';
+													echo '</tr>';
+
+												}
+
+													
+											?>
                                             </tbody>
                                         </table>
                                     </div>

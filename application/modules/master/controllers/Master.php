@@ -9,7 +9,7 @@ class Master extends MX_Controller
         $this->load->model('login/ProsesModel');
         $this->load->model('login/ReferensiModel');
         
-        if( !$this->session->userdata('isLoggedIn') && $this->session->userdata('leveluser')!='1'  ) {
+        if( $this->session->userdata('leveluser')!='1'  ) {
            redirect(base_url().'login/show_login');
         }
         
@@ -23,19 +23,36 @@ class Master extends MX_Controller
 		
 	}
     public function hapusKamus(){
-		
+		/*
 		$data=$this->input->post('hid');
 		$this->db->where_in('md5(hid)', $data);
         $this->db->delete('kamus_kegiatan');
 		$this->session->set_flashdata('response','<div class="alert alert-success m-t-40">Data berhasil dihapus. </div>');
+		*/
+		$hid=$this->input->post('hid');
+		$data=array(
+			'deleted_at'=>date("Y-m-d H:i:s"),
+			'deleted_by'=>$this->session->userdata('userName')
+		);
+		$this->ProsesModel->update_personal($data,$hid,'kamus_kegiatan','md5(hid)');
+		$this->session->set_flashdata('response', $this->ReferensiModel->showMessage('Data berhasil dihapus.', 'success'));
 		
 	}
     public function hapusJenjang(){
+		$hid=$this->input->post('hid');
+		$data=array(
+			'deleted_at'=>date("Y-m-d H:i:s"),
+			'deleted_by'=>$this->session->userdata('userName')
+		);
+		$this->ProsesModel->update_personal($data,$hid,'jenis_jabatan','md5(hid)');
+		$this->session->set_flashdata('response', $this->ReferensiModel->showMessage('Data berhasil dihapus.', 'success'));
 		
+		/*
 		$data=$this->input->post('hid');
 		$this->db->where_in('md5(hid)', $data);
         $this->db->delete('jenjang');
 		$this->session->set_flashdata('response','<div class="alert alert-success m-t-40">Data berhasil dihapus. </div>');
+		*/
 		
 	}
 	public function hapusKelompok(){
@@ -68,25 +85,57 @@ class Master extends MX_Controller
 		
 		redirect('master/users', 'refresh');
     }
+	public function add_dokumen(){
+		$data=array(
+			'kegiatan_hid'=>$this->input->post('hid'),
+			'output'=>$this->input->post('nama'),
+			'creation_date'=>date("Y-m-d H:i:s"),
+			'created_by'=>$this->session->userdata('userName')
+		);
+		
+		$this->ProsesModel->insert_personal($data,'kamus_dupak');
+		$this->session->set_flashdata('response', $this->ReferensiModel->showMessage('Data telah berhasil ditambahkan.', 'success'));
+		redirect('master/kamus?jabatan='.$this->input->post('jabatan').'&jenisjab='.$this->input->post('jenisjab'), 'refresh');
+	}
+	public function hapusDokumen(){
+		
+		$hid=$this->input->post('hid');
+		$data=array(
+			'deleted_at'=>date("Y-m-d H:i:s"),
+			'deleted_by'=>$this->session->userdata('userName')
+		);
+		$this->ProsesModel->update_personal($data,$hid,'kamus_dupak','md5(hid)');
+		$this->session->set_flashdata('response', $this->ReferensiModel->showMessage('Data berhasil dihapus.', 'success'));
+		
+	}
     function updateKamus(){
         $hid=$this->input->post('hid');
 		
 		$data=array(
 			'kategori'=>$this->input->post('kategori'),
-			'uraian_kegiatan'=>$this->input->post('nama'),
+			'unsur_kegiatan'=>$this->input->post('unsur'),
+			'subunsur_kegiatan'=>$this->input->post('subunsur'),
+			'butir_kegiatan'=>$this->input->post('nama'),
+			'jenis'=>$this->input->post('jenisak'),
+			'jenisjabatan_id'=>$this->input->post('jjab'),
+			'output'=>$this->input->post('output'),
+			'jumlah_ak'=>str_replace(",",".",$this->input->post('ak')),
 		);
+		if ($this->input->post('mjabatan')!='') $data=array_merge($data,array('jabatan_id'=>$this->input->post('mjabatan')));
+		if ($this->input->post('kelompok')!='') $data=array_merge($data,array('kelompok_jabatan'=>$this->input->post('kelompok')));
+		
 		if ($hid==''){
-            
+            $data=array_merge($data,array('creation_date'=>date("Y-m-d H:i:s"),'created_by'=>$this->session->userdata('userName')));
 			$this->ProsesModel->insert_personal($data,'kamus_kegiatan');
 			$this->session->set_flashdata('response', $this->ReferensiModel->showMessage('Data telah berhasil ditambahkan.', 'success'));
 		}else{
-           
+			$data=array_merge($data,array('updated_date'=>date("Y-m-d H:i:s"),'updated_by'=>$this->session->userdata('userName')));
 			$this->ProsesModel->update_personal($data,$hid,'kamus_kegiatan','hid');
 			$this->session->set_flashdata('response', $this->ReferensiModel->showMessage('Sukses mengupdate data.', 'success'));
 		}
 		
 		
-		redirect('master/kamus', 'refresh');
+		redirect('master/kamus?jabatan='.$this->input->post('mjabatan').'&kelompok='.$this->input->post('kelompok').'&jenisjab='.$this->input->post('jjab'), 'refresh');
     }
 	public function hapusJabatan(){
 		
@@ -105,10 +154,32 @@ class Master extends MX_Controller
 		
 	}
 	function copyKamus(){
-		//var_dump($_POST);
+				
+		$ids=explode(",",$this->input->post('ids'));
+		for ($i=0;$i<count($ids);$i++){
+			
+			// cek if exists
+			
+			
+			$sql="INSERT INTO kamus_kegiatan (kategori,uraian_kegiatan,jabatan_id,output,creation_date,created_by) SELECT kategori,uraian_kegiatan,'".$this->input->post('jabatan')."' jabatan_id,output,NOW(),'".$this->session->userdata('userName')."' FROM kamus_kegiatan a WHERE hid IN(".$ids[$i].") AND NOT EXISTS (SELECT 'x' FROM kamus_kegiatan WHERE jabatan_id='".$this->input->post('jabatan')."' AND uraian_kegiatan=a.uraian_kegiatan)";
+			$save=$this->db->query($sql);
+			$hdrid=$this->db->insert_id();
 		
-		$sql="INSERT INTO kamus_kegiatan (kategori,uraian_kegiatan,kelompok_id) SELECT kategori,uraian_kegiatan,'".$this->input->post('kelompok')."' kelompok_id FROM kamus_kegiatan WHERE hid IN(".$this->input->post('ids').")";
+			// insert dokumen
+			$sql="INSERT INTO kamus_dupak (kegiatan_hid,output,creation_date,created_by) SELECT '$hdrid' kegiatan_hid,output,NOW(),'".$this->session->userdata('userName')."' FROM kamus_dupak a WHERE hid IN(".$ids[$i].") AND NOT EXISTS(SELECT 'x' FROM kamus_dupak WHERE kegiatan_hid='$hdrid' AND output=a.output)";
+			$save=$this->db->query($sql);
+		
+		}
+		// insert kamus
+		/*
+		$sql="INSERT INTO kamus_kegiatan (kategori,uraian_kegiatan,jabatan_id) SELECT kategori,uraian_kegiatan,'".$this->input->post('jabatan')."' jabatan_id FROM kamus_kegiatan WHERE hid IN(".$this->input->post('ids').")";
 		$save=$this->db->query($sql);
+		
+		// insert dokumen
+		$sql="INSERT INTO kamus_dupak (kegiatan_hid,output) SELECT kegiatan_hid,output FROM kamus_dupak WHERE hid IN(".$this->input->post('ids').")";
+		$save=$this->db->query($sql);
+		*/
+		
 		$this->session->set_flashdata('response','<div class="alert alert-success m-t-40">Data berhasil disimpan. </div>');
 	}
 	function updateJabatan(){
@@ -116,16 +187,18 @@ class Master extends MX_Controller
 		
 		$data=array(
 			'kode_jab'=>$this->input->post('kdjab'),
-			'jenis_jab'=>$this->input->post('jjab'),
 			'jabatan'=>$this->input->post('nama'),
+			'jenisjabatan_id'=>$this->input->post('jjabatan'),
+			'kelompok_jabatan'=>$this->input->post('kelompok'),
+			'ak_kenaikan'=>$this->input->post('ak'),
 		);
 		if ($hid==''){
-            
-			$this->ProsesModel->insert_personal($data,'jabatan');
+            $data=array_merge($data,array('Creation_Date'=>date("Y-m-d H:i:s"),'Created_By'=>$this->session->userdata('userName')));
+			$this->ProsesModel->insert_personal($data,'jenjang_jabatan');
 			$this->session->set_flashdata('response', $this->ReferensiModel->showMessage('Data telah berhasil ditambahkan.', 'success'));
 		}else{
-           
-			$this->ProsesModel->update_personal($data,$hid,'jabatan','hid');
+			$data=array_merge($data,array('updated_date'=>date("Y-m-d H:i:s"),'updated_by'=>$this->session->userdata('userName')));
+			$this->ProsesModel->update_personal($data,$hid,'jenjang_jabatan','hid');
 			$this->session->set_flashdata('response', $this->ReferensiModel->showMessage('Sukses mengupdate data.', 'success'));
 		}
 		
@@ -155,20 +228,20 @@ class Master extends MX_Controller
         $hid=$this->input->post('hid');
 		
 		$data=array(
-			'jenjang'=>$this->input->post('nama'),
+			'jenis_jabatan'=>$this->input->post('nama'),
 		);
 		if ($hid==''){
             
-			$this->ProsesModel->insert_personal($data,'jenjang');
+			$this->ProsesModel->insert_personal($data,'jenis_jabatan');
 			$this->session->set_flashdata('response', $this->ReferensiModel->showMessage('Data telah berhasil ditambahkan.', 'success'));
 		}else{
            
-			$this->ProsesModel->update_personal($data,$hid,'jenjang','hid');
+			$this->ProsesModel->update_personal($data,$hid,'jenis_jabatan','hid');
 			$this->session->set_flashdata('response', $this->ReferensiModel->showMessage('Sukses mengupdate data.', 'success'));
 		}
 		
 		
-		redirect('master/jenjang', 'refresh');
+		redirect('master/jenisjabatan', 'refresh');
     }
     public function caripegawai(){
 		
@@ -210,6 +283,18 @@ class Master extends MX_Controller
         $data['judulpage']='Jenjang Jabatan';
         $data['action']='jenjang';
         $this->load->view('JenjangView',$data);
+       
+    }
+	function jenisjabatan() {
+        $data['judulpage']='Jenis Jabatan';
+        $data['action']='jenjang';
+        $this->load->view('JenjangView',$data);
+       
+    }
+	function pejabatjf() {
+        $data['judulpage']='Daftar Pejabat Fungsional';
+        $data['action']='pejabatjf';
+        $this->load->view('PegawaiJFView',$data);
        
     }
     function users() {

@@ -15,14 +15,15 @@
 	<div class="page-inner">
 	<div class="row">
 	<?php
-		$sql="SELECT a.hid,namaperiode,CONCAT(DATE_FORMAT(startdate,'%d %b %Y'),' s.d ',DATE_FORMAT(enddate,'%d %b %Y')) periode,
+		//var_dump($_SESSION);
+		$sql="SELECT a.hid,namaperiode,CONCAT(DATE_FORMAT(startdate,'%b %Y'),' s.d ',DATE_FORMAT(enddate,'%b %Y')) periode,
 		(SELECT CASE b.status
 				WHEN 1 THEN 'Draft'
 				WHEN 2 THEN 'Kirim ke Sekretariat'
-				WHEN 3 THEN 'Seleksi'
+				WHEN 3 THEN 'Distribusi Penilai'
 				WHEN 4 THEN 'Sudah Dinilai'
-				WHEN 5 THEN 'Selesai'
-				WHEN 6 THEN 'Tidak Lolos Seleksi'
+				WHEN 5 THEN 'Pleno'
+				WHEN 6 THEN 'Selesai'
 				ELSE ''
 			END status FROM pemohon b WHERE a.hid=b.periode_hid AND nip='".$this->session->userdata('userName')."') status,
 			(SELECT status FROM pemohon b WHERE a.hid=b.periode_hid AND nip='".$this->session->userdata('userName')."') statusid,
@@ -51,17 +52,21 @@
 						<span class="step-name">Kirim </span>
 						<span class="visuallyhidden">Step </span><span class="step-num">2</span>
 					</li>
-					<li class="<?php if ($rw['statusid']>=3  && $rw['statusid']!=6) echo 'active-step'; ?>">
-						<span class="step-name">Seleksi</span>
+					<li class="<?php if ($rw['statusid']>=3) echo 'active-step'; ?>">
+						<span class="step-name">Sudah ada Penilai</span>
 						<span class="visuallyhidden">Step </span><span class="step-num">3</span>
 					</li>
-					<li class="<?php if ($rw['statusid']>=4  && $rw['statusid']!=6) echo 'active-step'; ?>">
-						<span class="step-name">Penilaian</span>
+					<li class="<?php if ($rw['statusid']>=4) echo 'active-step'; ?>">
+						<span class="step-name">Sudah Dinilai</span>
 						<span class="visuallyhidden">Step </span><span class="step-num">4</span>
 					</li>
-					<li class="<?php if ($rw['statusid']==5) echo 'active-step'; ?>">
-						<span class="step-name">Nilai PAK</span>
+					<li class="<?php if ($rw['statusid']>=5) echo 'active-step'; ?>">
+						<span class="step-name">Masuk Pleno</span>
 						<span class="visuallyhidden">Step </span><span class="step-num">5</span>
+					</li>
+					<li class="<?php if ($rw['statusid']==6) echo 'active-step'; ?>">
+						<span class="step-name">Selesai</span>
+						<span class="visuallyhidden">Step </span><span class="step-num">6</span>
 					</li>
 				</ol>
 				<?php } ?>
@@ -106,7 +111,7 @@
 						method: 'post',
 						success: function(data) {
 							//alert(data);
-							window.location.href = '<?php echo base_url();?>user/formdupak';
+							window.location.href = '<?php echo base_url();?>user/dupak';
 						}
 					})
                 } 

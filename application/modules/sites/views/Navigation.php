@@ -36,7 +36,7 @@
 							<a class="dropdown-toggle profile-pic" data-toggle="dropdown" href="#" aria-expanded="false">
 								<div class="avatar-sm">
 									<?php
-										if ($this->session->userdata('leveluser')=='') echo '<img src="'.URL_FOTO_SIMSDM.'/'.$this->session->userdata('foto').'" alt="..." class="avatar-img rounded-circle">';
+										if ($this->session->userdata('leveluser')=='' || $this->session->userdata('leveluser')=='3') echo '<img src="'.URL_FOTO_SIMSDM.'/'.$this->session->userdata('foto').'" alt="..." class="avatar-img rounded-circle">';
 										else {
 											if ($this->session->userdata('foto')=='')
 												echo '<img src="'.base_url().'assets/img/profile.jpg" class="avatar-img rounded-circle">';
@@ -52,7 +52,7 @@
 										<div class="user-box">
 											<div class="avatar-lg">
 											<?php
-												if ($this->session->userdata('leveluser')=='') echo '<img src="'.URL_FOTO_SIMSDM.'/'.$this->session->userdata('foto').'" alt="..." class="avatar-img rounded">';
+												if ($this->session->userdata('leveluser')=='' || $this->session->userdata('leveluser')=='3') echo '<img src="'.URL_FOTO_SIMSDM.'/'.$this->session->userdata('foto').'" alt="..." class="avatar-img rounded">';
 													else {
 													if ($this->session->userdata('foto')=='')
 														echo '<img src="'.base_url().'assets/img/profile.jpg" class="avatar-img rounded">';

@@ -13,118 +13,68 @@
                         <div class="col-md-12">
                             <div class="card">
                                 <div class="card-header">
-                                    <h4 class="card-title">Butir Angka Kredit</h4>
-                                    <div class="d-flex align-items-left align-items-md-center flex-column flex-md-row">
-                                        <div class="ml-md-auto py-2 py-md-0">
-                                            <a href="<?php echo base_url(); ?>master/modal?action=<?php echo $action; ?>" class="btn btn-secondary btn-round ls-modal">
-                                                <span class="btn-label">
-                                                    <i class="fa fa-plus"></i>
-                                                </span> Tambah</a>
-                                        </div>
-                                    </div>
+                                    <h4 class="card-title">Penilaian Dalam Proses</h4>
+                                   
                                 </div>
 
                                 <div class="card-body">
                                     <div class="table-responsive">
-										<div class="row">
-										<div class="col-md-3">
-											<div class="form-group">
-											<label for="defaultSelect">Jenis Jabatan</label>
-											<?php
-													
-													$sql="SELECT hid kode, jenis_jabatan nilai FROM jenis_jabatan ORDER BY jenis_jabatan";
-													echo $this->ReferensiModel->LoadListMaster($sql,'jenisjab',$this->input->get('jenisjab'),'class="form-control" required','');
-												?>
-											</div>
-										</div>
-										<div class="col-md-3">
-											<div class="form-group">
-											<label for="defaultSelect">Kelompok Jabatan</label>
-											<?php
-												
-												$list=array('Ahli','Terampil');
-												echo $this->ReferensiModel->LoadList($list,$list,'kelompok',$this->input->get('kelompok'),'class="form-control" required','');
-											?>
-											</div>
-										</div>
-										<div class="col-md-4">
-											<div class="form-group">
-											<label for="defaultSelect">Jabatan Fungsional</label>
-											<?php
-													
-													$sql="SELECT hid kode, CONCAT(kode_jab,'-',jabatan) nilai FROM jenjang_jabatan WHERE jenisjabatan_id=".$this->db->escape($this->input->get('jenisjab'))." ORDER BY jabatan";
-													echo $this->ReferensiModel->LoadListMaster($sql,'jabatan',$this->input->get('jabatan'),'class="form-control" required','');
-												?>
-											</div>
-										</div>
-										<div class="col-md-2"><br>
-											<div class="form-group"><button type="button" class="btn btn-sm btn-primary mr-2" id="btn1">Copy</button><button type="button" class="btn btn-sm btn-warning" id="btn2">Tampilkan</button></div>
-											
-										</div>
-										</div>
-                                        <table id="datatable" class="display table table-striped table-hover dataTable">
+										<table id="datatable" class="display table table-striped dataTable">
                                             <thead>
                                                 <tr>
-                                                    <th><div class="form-check">
-															<label class="form-check-label">
-																<input class="form-check-input" type="checkbox" value="1" id="ckall">
-																<span class="form-check-sign"></span>
-															</label>
-														</div>
-                                                    </th>
-													<th scope="col">Kategori</th>
-                                                    <th scope="col">Butir Kegiatan</th>
-													<th scope="col">Kelompok Jabatan</th>
-													<th scope="col">Jabatan Fungsional</th>
-													<th scope="col">Jenis</th>
-													<th scope="col">Output</th>
-													<th scope="col">Angka Kredit</th>
-													<th scope="col">Dokumen Fisik</th>
-													<th scope="col">Aksi</th>
-                                                </tr>
+													<th scope="col">NO
+													</th>
+													<th>AKSI</th>
+													<th>PERIODE</th>
+													<th>FOTO</th>
+													<th>NAMA</th>
+													<th>NIP</th>
+													<th>PANGKAT/GOL</th>
+													<th>TMT GOL</th>
+													<th>JABATAN</th>
+													<th>UNIT KERJA</th>
+													<th>STATUS</th>
+												</tr>
                                             </thead>
                                             <tbody>
-                                                <?php
-                                                $n = 0;
+                                            <?php
+												$n=0;
 												$sql2="";
-												$sql2=" AND a.jenisjabatan_id=".$this->db->escape($this->input->get('jenisjab'));
-												if ($this->input->get('kelompok')!='') $sql2.=" AND a.kelompok_jabatan=".$this->db->escape($this->input->get('kelompok'));
-												if ($this->input->get('jabatan')!='') $sql2.=" AND (jabatan_id=".$this->db->escape($this->input->get('jabatan'))." OR jabatan_id IS NULL )";
-                                                $sql="SELECT a.*,b.jabatan,b.kode_jab FROM kamus_kegiatan a LEFT JOIN jenjang_jabatan b ON a.jabatan_id=b.hid WHERE a.deleted_at IS NULL $sql2 ORDER BY b.jabatan,kategori,a.hid";
-							                    
-												$cn = $this->db->query($sql);
-                                                foreach ($cn->result() as $rw) {
-                                                    $n++;
-                                                    echo '<tr>';
-                                                    echo '<td>';
-													echo '<div class="form-check"><label class="form-check-label"><input class="form-check-input ckdel"  type="checkbox" value="'.$rw->hid.'"><span class="form-check-sign"></span></label></div>';
+												
+												
+												$sql="SELECT a.*,DATE_FORMAT(a.tmtjab,'%d-%m-%Y') tmtjab,b.foto,c.namalengkap penilai,p.namaperiode
+														FROM pemohon a JOIN users b ON a.nip=b.username
+														LEFT JOIN penilai c ON a.penilai_id=c.hid 
+														JOIN periode p ON p.hid=a.periode_hid
+														WHERE a.status='3' AND penilaiandate IS NULL AND c.nip='".$this->session->userdata('userName')."'";
+												//echo $sql;
+												$pangkat = $this->db->query($sql);
+												foreach ($pangkat->result() as $rw){
+													
+													$n++;
+													echo '<tr>';
+													echo '<td>'.$n.'</td>';	
+													echo '<td>';
+													echo '<a href="'.base_url().'penilai/penilaian?hid='.md5(TOKEN_DOP.$rw->hid).'" class="mr-2" title="Penilaian"><i class="icon-note fa-2x"></i></a>';
 													echo '</td>';
-                                                    echo '<td>'.$rw->kategori.'</td>';
-                                                    echo '<td>'.$rw->butir_kegiatan.'</td>';
-													echo '<td>'.$rw->kelompok_jabatan.'</td>';
-													echo '<td>'.$rw->kode_jab.'-'.$rw->jabatan.'</td>';
-													echo '<td>'.$rw->jenis.'</td>';
-													echo '<td>'.$rw->output.'</td>';
-													echo '<td>'.$rw->jumlah_ak.'</td>';
-													echo '<td><ul>';
-													echo '<button type="button" class="btn btn-icon btn-sm btn-round btn-primary dokumen" data-id="'.$rw->hid.'"><i class="fa fa-plus"></i></button>';
-													$sql="SELECT * FROM kamus_dupak WHERE kegiatan_hid='".$rw->hid."' AND deleted_at IS NULL";
-													$cn2 = $this->db->query($sql);
-													foreach ($cn2->result() as $rw2){
-														echo '<li>'.$rw2->output.' <a href="" class="deldok" data-id="'.md5($rw2->hid).'"><i class="fa fa-trash" style="color:red"></i></a></li>';
-													}
+													echo '<td>'.$rw->namaperiode.'</td>';	
+													echo '<td><img src="'.URL_FOTO_SIMSDM.$rw->foto.'"  class="img-circle" width="60"></td>';
+													echo '<td>'.$rw->namalengkap.'</td>';
+													echo '<td>'.$rw->nip.'</td>';
+													echo '<td>'.$rw->pangkatgol.'</td>';
+													echo '<td>'.date("d-m-Y",strtotime($rw->tmtgol)).'</td>';
+													echo '<td>'.$rw->jabatan.'</td>';
+													echo '<td>'.$rw->unitkerja.'</td>';
+													echo '<td>'.$this->ReferensiModel->StatusDupak($rw->status).'</td>';
+													echo '</tr>';
+
+												}
+
 													
-													echo '</ul></td>';
-													
-                                                    echo '<td><div class="form-button-action">';
-                                                    echo '<a href="' . base_url() . 'master/modal?hid=' . $rw->hid . '&action=' . $action . '" class="btn btn-link btn-primary btn-lg ls-modal"><i class="fa fa-edit"></i></a>';
-                                                    echo '<a href="" class="btn btn-link btn-danger del" data-id="' . md5($rw->hid). '"><i class="fa fa-trash"></i></a>';
-                                                    echo '</div></td>';
-                                                    echo '</tr>';
-                                                }
-                                                ?>
+											?>
                                             </tbody>
                                         </table>
+                                        
                                     </div>
                                 </div>
                             </div>

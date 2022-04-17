@@ -9,9 +9,104 @@ class Penilaian extends MX_Controller
         $this->load->model('login/ProsesModel');
         $this->load->model('login/ReferensiModel');
         
-        if( !$this->session->userdata('isLoggedIn') && $this->session->userdata('leveluser')!='1' ) {
+        if($this->session->userdata('leveluser')!='1' ) {
            redirect(base_url().'login/show_login');
         }
+    }
+	public function addto_pleno(){
+		//var_dump($_POST);
+		$sql="UPDATE pemohon SET pleno_date=NOW(),pleno_id='".$this->input->post('plenoid')."',status='5',updateddate=NOW(),updatedby='".$this->session->userdata('userName')."' WHERE hid IN(".$this->input->post('ids').")";
+		//echo $sql;
+		$save=$this->db->query($sql);
+		
+		// looping ids for logs
+		$ids=explode(",",$this->input->post('ids'));
+		for ($i=0;$i<count($ids);$i++){
+			$data=array(
+				'pleno_id'=>$this->input->post('plenoid'),
+				'pemohon_id'=>$ids[$i],
+				'creation_date'=>date("Y-m-d H:i:s"),
+				'created_by'=>$this->session->userdata('userName')
+			);
+			$this->ProsesModel->insert_personal($data,'pleno_lines');
+			$insertid=$this->db->insert_id();
+			
+			$this->ReferensiModel->insert_logs($this->session->userdata('userName'),'create','ditambahkan ke pleno',$insertid,'pleno_lines');
+		}
+		
+		$this->session->set_flashdata('response','<div class="alert alert-success m-t-40">Data berhasil disimpan. </div>'); 
+	}
+	public function simpanbap(){
+		$ids=explode(",",$this->input->post('ids'));
+		for ($i=0;$i<count($ids);$i++){
+			$data=array(
+				'status'=>6,
+				'updateddate'=>date("Y-m-d H:i:s"),
+				'updatedby'=>$this->session->userdata('userName'),
+				'tgl_bap'=>$this->ReferensiModel->DMYtoYMD($this->input->post('tgl1')),
+				'tgl_surat'=>$this->ReferensiModel->DMYtoYMD($this->input->post('tgl2')),
+				'no_bap'=>$this->input->post('nomor')
+			);
+			$this->ProsesModel->update_personal($data,$ids[$i],'pemohon','hid');
+			
+			$this->ReferensiModel->insert_logs($this->session->userdata('userName'),'create','proses bap',$ids[$i],'pemohon');
+		}
+		
+		$this->session->set_flashdata('response','<div class="alert alert-success m-t-40">Data berhasil disimpan. </div>'); 
+	}
+	public function proses_pleno(){
+		
+		// looping ids for logs
+		$ids=explode(",",$this->input->post('ids'));
+		for ($i=0;$i<count($ids);$i++){
+			$data=array(
+				'status'=>1,
+				'updated_date'=>date("Y-m-d H:i:s"),
+				'updated_by'=>$this->session->userdata('userName')
+			);
+			$this->ProsesModel->update_personal($data,$ids[$i],'pleno_lines','hid');
+			
+			$this->ReferensiModel->insert_logs($this->session->userdata('userName'),'create','diproses pleno',$ids[$i],'pleno_lines');
+		}
+		
+		$this->session->set_flashdata('response','<div class="alert alert-success m-t-40">Data berhasil disimpan. </div>'); 
+	}
+	public function add_penilai(){
+		$sql="UPDATE pemohon SET penilai_id='".$this->input->post('penilai')."',status='3',updateddate=NOW(),updatedby='".$this->session->userdata('userName')."' WHERE hid IN(".$this->input->post('ids').")";
+		//echo $sql;
+		$save=$this->db->query($sql);
+		
+		// looping ids for logs
+		$ids=explode(",",$this->input->post('ids'));
+		for ($i=0;$i<count($ids);$i++){
+			$this->ReferensiModel->insert_logs($this->session->userdata('userName'),'create','set penilai',$ids[$i],'pemohon');
+		}
+		
+		$this->session->set_flashdata('response','<div class="alert alert-success m-t-40">Penilai berhasil disimpan. </div>'); 
+	}
+	function updatePleno(){
+        $tgl1=$this->input->post('tgl1');
+		$nama=$this->input->post('nama');
+		$ket=$this->input->post('keterangan');
+		$hid=$this->input->post('hid');
+		
+		$data=array(
+			'nama_pleno'=>$nama,
+			'tgl_pleno'=>$this->ReferensiModel->DMYtoYMD($tgl1),
+			'keterangan'=>$ket
+		);
+		
+		
+		if ($hid==''){
+			$this->ProsesModel->insert_personal($data,'pleno_header');
+			$this->session->set_flashdata('response','<div class="alert alert-success m-t-40">Data berhasil ditambahkan. </div>');
+		}else{
+			$this->ProsesModel->update_personal($data,$hid,'pleno_header','hid');
+			$this->session->set_flashdata('response','<div class="alert alert-success m-t-40">Data berhasil diupdate. </div>');
+		}
+		
+		
+		redirect('penilaian/pleno', 'refresh');
     }
     function updatePeriode(){
         $tgl1="01-".$this->input->post('tgl1');
@@ -32,8 +127,8 @@ class Penilaian extends MX_Controller
 			'namaperiode'=>$nama,
 			'nomor_awal'=>$nomor,
 			'format_nomor'=>$format,
-			'startdate '=>$this->ReferensiModel->DMYtoYMD($tgl1),
-			'enddate '=>$this->ReferensiModel->DMYtoYMD($tgl2),
+			'startdate'=>$this->ReferensiModel->DMYtoYMD($tgl1),
+			'enddate'=>$this->ReferensiModel->DMYtoYMD($tgl2),
 			'kota_pak'=>$kota
 		);
 		
@@ -82,6 +177,74 @@ class Penilaian extends MX_Controller
 		
 		redirect('penilaian/periode', 'refresh');
     }
+	public function xlsdistribusi(){
+		require_once 'assets/js/plugin/phpxls1.8/Classes/PHPExcel.php';
+		$objPHPExcel = PHPExcel_IOFactory::load('assets/templates/peserta.xlsx');
+		// style
+		require_once 'assets/js/plugin/style.php';
+		
+		$periode=$this->ReferensiModel->LoadSQL("SELECT namaperiode judul FROM periode WHERE md5(CONCAT('".TOKEN_DOP."',hid))='".$this->input->get('phid')."'");
+		$objPHPExcel->getActiveSheet()->setCellValue('C2', $periode);
+		$objPHPExcel->getActiveSheet()->setCellValue('C3', $this->ReferensiModel->StatusDupak($this->input->get('status')));
+		
+		
+		
+		$n=0;
+		$sql2="";
+							if ($this->input->get('status')!='') $sql2.=" AND a.status>='".$this->input->get('status')."'";
+							if ($this->input->get('status')=='3') $sql2.=" AND a.status IN(3,4,5)";
+							if ($this->input->get('jenis')=='belum') $sql2.=" AND a.penilai_id IS NULL AND a.status IN(3)";
+							if ($this->input->get('jenis')=='ada') $sql2.=" AND a.penilai_id IS NOT NULL AND a.status IN('3','4','5')";
+
+							$sql="SELECT a.*,DATE_FORMAT(a.tmtjab,'%d-%m-%Y') tmtjab,b.foto,c.namalengkap penilai
+									FROM pemohon a JOIN users b ON a.nip=b.username
+									LEFT JOIN penilai c ON a.penilai_id=c.hid WHERE md5(CONCAT('".TOKEN_DOP."',periode_hid))='".$this->input->get('phid')."' $sql2";
+							//echo $sql;exit();
+							$pangkat = $this->db->query($sql);
+		foreach ($pangkat->result() as $rw){
+			$n++;
+			$fr=$n+5;
+			$objPHPExcel->getActiveSheet()->setCellValue('A'.$fr, $n);	
+			$objPHPExcel->getActiveSheet()->setCellValueExplicit('B'.$fr, $rw->penilai, PHPExcel_Cell_DataType::TYPE_STRING);
+			$objPHPExcel->getActiveSheet()->setCellValueExplicit('C'.$fr, $rw->no_pak, PHPExcel_Cell_DataType::TYPE_STRING);
+			$objPHPExcel->getActiveSheet()->setCellValueExplicit('D'.$fr, $rw->namalengkap, PHPExcel_Cell_DataType::TYPE_STRING);
+			$objPHPExcel->getActiveSheet()->setCellValueExplicit('E'.$fr, $rw->nip, PHPExcel_Cell_DataType::TYPE_STRING);
+			$objPHPExcel->getActiveSheet()->setCellValue('F'.$fr, $rw->karpeg);
+			$objPHPExcel->getActiveSheet()->setCellValueExplicit('G'.$fr, $rw->pangkatgol, PHPExcel_Cell_DataType::TYPE_STRING);
+			$objPHPExcel->getActiveSheet()->setCellValue('H'.$fr, date("d-m-Y",strtotime($rw->tmtgol)));
+			$objPHPExcel->getActiveSheet()->setCellValueExplicit('I'.$fr, $rw->tempatlahir.','.date("d-m-Y",strtotime($rw->tgllahir)), PHPExcel_Cell_DataType::TYPE_STRING);
+			$objPHPExcel->getActiveSheet()->setCellValueExplicit('J'.$fr, $rw->jeniskelamin, PHPExcel_Cell_DataType::TYPE_STRING);
+			$objPHPExcel->getActiveSheet()->setCellValueExplicit('K'.$fr, $rw->pendidikan, PHPExcel_Cell_DataType::TYPE_STRING);
+			$objPHPExcel->getActiveSheet()->setCellValueExplicit('L'.$fr, $rw->jabatan, PHPExcel_Cell_DataType::TYPE_STRING);
+			$objPHPExcel->getActiveSheet()->setCellValue('M'.$fr, $rw->tmtjab);
+			$objPHPExcel->getActiveSheet()->setCellValue('N'.$fr, $rw->unitkerja);
+			$objPHPExcel->getActiveSheet()->setCellValue('O'.$fr, $rw->kabkota);
+			$objPHPExcel->getActiveSheet()->setCellValue('P'.$fr, $this->ReferensiModel->StatusDupak($rw->status));
+			
+			$objPHPExcel->getActiveSheet()->getStyle('A'.($fr).':P'.$fr)->applyFromArray($styleArray4);
+			$objPHPExcel->getActiveSheet()->getStyle('B'.$fr.':'.'P'.$fr)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_LEFT);
+			$objPHPExcel->getActiveSheet()->getStyle('A'.$fr)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+		}
+		
+		$objPHPExcel->getActiveSheet()->setShowGridlines(false);
+		$filename="peserta".$this->session->userdata('userName').date('YmdHis').".xls";
+		
+		
+		ob_end_clean();
+		
+		// Redirect output to a client’s web browser (Excel5)
+		header("Content-Type: application/vnd.ms-excel");
+		header("Content-Disposition: attachment; filename=\"".$filename."\"");
+		header("Cache-Control: max-age=0");
+
+		// Save Excel 2007 file
+		$objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
+		//$objWriter->save(str_replace('.php', '.xls', __FILE__));
+		$objWriter->save("php://output");
+		exit;
+		
+			
+	}
     public function updatePenilai(){
         $pegawai=explode('|',$this->input->post('pegawai'));
 		$niplama=$pegawai[1];
@@ -184,10 +347,17 @@ class Penilaian extends MX_Controller
 		redirect('penilaian/penilai');
 	}
     public function hapusPeriode(){
-		
+		/*
 		$data=$this->input->post('hid');
 		$this->db->where_in('md5(hid)', $data);
         $this->db->delete('periode');
+		*/
+		$data=array(
+			'deleted_by'=>$this->session->userdata('userName'),
+			'deleted_at'=>date("Y-m-d H:i:s"),
+		);
+		$this->ProsesModel->update_personal($data,$this->input->post('hid'),'periode','md5(hid)');
+		
 		$this->session->set_flashdata('response','<div class="alert alert-success m-t-40">Data berhasil dihapus. </div>');
 		
 	}
@@ -199,6 +369,38 @@ class Penilaian extends MX_Controller
 		$this->session->set_flashdata('response','<div class="alert alert-success m-t-40">Data berhasil dihapus. </div>');
 		
 	}
+	function distribusi() {
+        $data['judulpage']='Distribusi Penilaian';
+        $data['action']='distribusi';
+        $this->load->view('DistribusiView',$data);
+       
+    }
+	function dtldistribusi() {
+        $data['judulpage']='Detil Distribusi Penilaian';
+        $data['action']='dtldistribusi';
+		
+		$subtitle=array('peserta'=>'Data Peserta yang terdaftar','belum'=>'Data Peserta belum ada penilai','ada'=>'Data Peserta sudah ada penilai','blmdinilai'=>'Data peserta belum dinilai','sdhdinilai'=>'Data peserta sudah dinilai','selesai'=>'Data peserta sudah selesai penilaian');
+		$data['subtitle']=$subtitle;
+		
+        $this->load->view('DtlDistribusiView',$data);
+       
+    }
+    function dtlpleno() {
+        $data['judulpage']='Detil Pleno';
+        $data['action']='dtlpleno';
+		
+		$query=$this->db->get_where('pleno_header',array("md5(CONCAT('".TOKEN_DOP."',hid))"=>$this->input->get('hid')));
+		$rw=$query->row();
+		$data['rw']=$rw;
+		
+		$hid=$this->input->get('hid');
+		$tab=$this->input->get('tab');
+		$data['hid']=$hid;
+		$data['tab']=$tab;
+		
+        $this->load->view('DetilPlenoView',$data);
+       
+    }
     function periode() {
         $data['judulpage']='Periode PAK';
         $data['action']='periode';
@@ -221,6 +423,22 @@ class Penilaian extends MX_Controller
         $data['judulpage']='Butir Angka Kredit';
         $data['action']='kamus';
         $this->load->view('KamusView',$data);
+       
+    }
+	function pleno() {
+        $data['judulpage']='Jadwal Pleno';
+        $data['action']='pleno';
+		$data['tab']=$this->input->get('tab');
+        $this->load->view('PlenoView',$data);
+       
+    }
+	function bap() {
+        $data['judulpage']='BAP';
+        $data['action']='bap';
+		$data['tab']=$this->input->get('tab');
+		$data['hid']=$this->input->get('hid');
+		$data['periode']=$this->input->get('periode');
+        $this->load->view('BapView',$data);
        
     }
     function modal(){
