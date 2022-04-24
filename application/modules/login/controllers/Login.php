@@ -41,13 +41,13 @@ class Login extends MX_Controller
 		$securimage = new Securimage();
 				
 		
-		/*
-		if ($securimage->check($this->input->post('captcha')) == false) {
+		
+		if ($securimage->check($this->input->post('user-captcha')) == false) {
 			$this->session->set_flashdata('response','<div class="alert alert-card alert-danger" role="alert">Captcha salah.<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>');
 			redirect('login/show_login');
 			exit();
 		}
-		*/
+		
 		
         //Ensure values exist for email and pass, and validate the user's credentials
         if( $email && $pass && $this->UserModel->validate_user($email,$pass) && $this->UserModel->checkToken($token, 'sig_in')) {

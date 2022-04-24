@@ -49,7 +49,7 @@
 					</div>
 					<div class="form-group">
 						<label for="captcha" class="placeholder"><b>Captcha</b></label>
-						<input id="user-captcha" name="user-captcha" type="text" value="X" class="form-control" required>
+						<input id="user-captcha" name="user-captcha" type="text" value="" class="form-control" required>
 					</div>
 					<div class="form-group ">
 						<label class="form-label"><small>Tulis karakter yang terdapat pada gambar di bawah</small></label>

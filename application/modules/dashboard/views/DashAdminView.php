@@ -108,6 +108,40 @@
 						</div>
 						
 					</div>
+					<div class="row">
+						<div class="col-md-6">
+							<div class="card">
+								<div class="card-header">
+									<div class="card-title">Produktifitas Penilai</div>
+								</div>
+								<div class="card-body pb-0">
+									<?php
+									
+										$sql="SELECT nip,foto,b.namalengkap,SUM(1) ttl FROM pemohon_penilai a JOIN penilai b ON a.penilai_id=b.hid GROUP BY nip,foto,namalengkap ORDER BY ttl DESC;";
+										$cn = $this->db->query($sql);
+										foreach ($cn->result() as $rw){
+											if ($rw->foto!='') $img=URL_FOTO_SIMSDM.'/'.$rw->foto; else $img=base_url().'assets/img/profile.jpg';
+											echo '<div class="d-flex">
+												<div class="avatar">
+													<img src="'.$img.'" alt="'.$rw->namalengkap.'" class="avatar-img rounded-circle">
+												</div>
+												<div class="flex-1 pt-1 ml-2">
+													<h6 class="fw-bold mb-1">'.$rw->namalengkap.'</h6>
+													<small class="text-muted">'.$rw->nip.'</small>
+												</div>
+												<div class="d-flex ml-auto align-items-center">
+													<h3 class="text-info fw-bold">'.$rw->ttl.'</h3>
+												</div>
+											</div>
+											<div class="separator-dashed"></div>';
+											
+										}
+									?>
+									
+								</div>
+							</div>
+						</div>
+					</div>
 				</div>
 			</div>		
 		<script>
