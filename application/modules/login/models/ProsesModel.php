@@ -85,5 +85,12 @@ class ProsesModel extends CI_Model {
 			
 			return $rw['judul'];
 	   }
+	   public function NilaiTotalPAKPenilai($hid,$penilaiid){
+			$sql="SELECT ROUND(SUM(total_nilai),3) judul FROM dupak a JOIN kamus_kegiatan b ON a.kegiatan_id=b.hid JOIN dupak_penilai c ON a.hid=c.dupak_id WHERE pemohon_id='$hid' AND penilai_id='$penilaiid'";
+			$cn=$this->db->query($sql);
+			$rw=$cn->row_array();
+			
+			return $rw['judul'];
+	   }
 
 }

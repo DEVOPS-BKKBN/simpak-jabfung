@@ -63,6 +63,13 @@
 														LEFT JOIN penilai c ON a.penilai_id=c.hid 
 														JOIN periode p ON p.hid=a.periode_hid
 														WHERE a.status='4' AND c.nip='".$this->session->userdata('userName')."' $sql2";
+												$sql="SELECT a.*,DATE_FORMAT(a.tmtjab,'%d-%m-%Y') tmtjab,b.foto,d.namalengkap penilai,p.namaperiode 
+														FROM pemohon a 
+														JOIN users b ON a.nip=b.username 
+														JOIN pemohon_penilai c ON a.hid=c.pemohon_id 
+														JOIN periode p ON p.hid=a.periode_hid
+														JOIN penilai d ON c.penilai_id=d.hid
+														WHERE a.status >= '4' AND penilaian_date IS NOT NULL AND d.nip='".$this->session->userdata('userName')."' $sql2";
 												//echo $sql;
 												$pangkat = $this->db->query($sql);
 												foreach ($pangkat->result() as $rw){
@@ -83,7 +90,7 @@
 													echo '<td>'.$rw->jabatan.'</td>';
 													echo '<td>'.$rw->unitkerja.'</td>';
 													echo '<td>'.$this->ReferensiModel->StatusDupak($rw->status).'</td>';
-													echo '<td>'.$this->ProsesModel->NilaiTotalPAKFinal($rw->hid).'</td>';
+													echo '<td>'.$this->ProsesModel->NilaiTotalPAKPenilai($rw->hid,$penilaiid).'</td>';
 													echo '</tr>';
 
 												}

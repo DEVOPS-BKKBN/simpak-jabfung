@@ -408,3 +408,122 @@ $rw = $query->row_array();
     });
 </script>
 <?php } ?>
+
+<?php if ($action == 'penilainon') {
+?>
+<form action="<?php echo base_url(); ?>penilaian/updatePenilaiNon" method="post" name="formmodal" id="formmodal" enctype="multipart/form-data">
+    <input type="hidden" name="hid" value="<?php echo $hid; ?>" />
+    <input type="hidden" name="action" value="<?php echo $action; ?>" />
+    <div class="modal-header">
+        <h4 class="modal-title">Penilai Non SIMSDM</h4>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+    </div>
+
+    <div class="modal-body">
+        <div class="row">
+			<div class="col-md-6 group">
+                <div class="form-group">
+                    <label>NIK/NIP <small>* sebagai username</small></label>
+                    <input type="text" name="nik" class="form-control" value="<?php if (!empty($rw)) echo $rw['namalengkap']; ?>" required> 
+                </div>
+            </div>	
+			<div class="col-md-6 group">
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" name="upwd" class="form-control" value="" required> 
+                </div>
+            </div>
+			
+            <div class="col-md-6 group">
+                <div class="form-group">
+                    <label>Nama Lengkap</label>
+                    <input type="text" name="nama" class="form-control" value="<?php if (!empty($rw)) echo $rw['namalengkap']; ?>" required> 
+                </div>
+            </div>	
+            <div class="col-md-6 group">
+                <div class="form-group">
+                    <label>Jabatan</label>
+                    <input type="text" name="jbt" class="form-control" value="<?php if (!empty($rw)) echo $rw['jabatan']; ?>" required> 
+                </div>
+            </div>
+            <div class="col-md-6 group">
+                <div class="form-group">
+                    <label>Golongan Pangkat</label>
+                    <input type="text" name="golongan" class="form-control" value="<?php if (!empty($rw)) echo $rw['golonganpangkat']; ?>" required> 
+                </div>
+            </div>
+            <div class="col-md-6 group">
+                <div class="form-group">
+                    <label>Sebagai</label>
+                    <?php
+                        if (!empty($rw)) $status=$rw['sebagai']; else $status="";
+                        $list=array('Anggota','Ketua');
+                        echo $this->ReferensiModel->LoadList($list,$list,'sebagai',$status,'class="form-control custom-select" required','');
+                    ?>
+                </div>
+            </div>
+            <div class="col-md-6 group">
+                <div class="form-group">
+                    <label>Unit Kerja</label>
+                    <input type="text" name="unitkerja" class="form-control" value="<?php if (!empty($rw)) echo $rw['unitkerja']; ?>" required> 
+                </div>
+            </div>
+            <div class="col-md-6 group">
+                <div class="form-group">
+                    <label>Jenjang Jabatan</label>
+                    <?php
+                        if (!empty($rw)) $jenjang=$rw['jenjang']; else $jenjang="";
+                        $sql = "SELECT jenjang kode, jenjang nilai FROM jenjang ";
+                        echo $this->ReferensiModel->LoadListMaster($sql, 'jenjang', $jenjang, 'class="form-control" required');
+                    ?>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Tutup</button>
+        <button type="submit" class="btn btn-primary" id="btnsimpan">Simpan</button>
+    </div>
+</form>
+<script>
+    $('.datepicker').datetimepicker({
+            format: 'DD-MM-YYYY',
+        });
+    $("#pegawai").select2({
+		ajax: {
+			url: "<?php echo base_url(); ?>master/caripegawai",
+			dataType: 'json',
+			delay: 250,
+			data: function(params) {
+				return {
+					q: params.term // search term
+				};
+			},
+			processResults: function(data) {
+				return {
+					results: data
+				};
+			},
+			cache: true
+		},
+		minimumInputLength: 5,
+		width: "100%",
+		dropdownParent: $("#largeModal")
+	});
+    $('#formmodal').validate({
+        rules: {
+        },
+        messages: {
+        },
+        highlight: function(input) {
+            $(input).parents('.form-line').addClass('alert-danger');
+        },
+        unhighlight: function(input) {
+            $(input).parents('.form-line').removeClass('alert-danger');
+        },
+        errorPlacement: function(error, element) {
+            $(element).parents('.group').append(error);
+        }
+    });
+</script>
+<?php } ?>

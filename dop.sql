@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3308
--- Generation Time: Apr 17, 2022 at 03:40 PM
+-- Generation Time: Apr 24, 2022 at 01:47 PM
 -- Server version: 5.5.57-MariaDB
 -- PHP Version: 7.2.6
 
@@ -75,13 +75,40 @@ CREATE TABLE `dokumen` (
 --
 
 INSERT INTO `dokumen` (`hid`, `pemohon_hid`, `dupak_hid`, `dokumen_hid`, `dokumen_name`, `file_name`, `status_approval`, `notes_approval`, `jenis`, `creationdate`, `createdby`, `updateddate`, `updatedby`) VALUES
-(1, 1, 1, 18, '', '198903112010122001_coverbiren2019.jpg', 3, 'Dokumen kurang lengkap', 'pak', '2022-04-13 03:25:10', '198903112010122001', '2022-04-14 05:23:50', '198603072009121008'),
-(2, 1, 2, 20, '', '198903112010122001_Capture.JPG', 1, '', 'pak', '2022-04-13 03:33:35', '198903112010122001', '2022-04-14 05:26:23', '198603072009121008'),
-(3, 1, 4, 15, '', '198903112010122001_dokumen_15.png', 1, '', 'pak', '2022-04-13 05:05:18', '198903112010122001', '2022-04-14 05:55:57', '198603072009121008'),
-(4, 1, 3, 1, '', '198903112010122001_dokumen_1.jpg', 1, '', 'pak', '2022-04-13 05:07:03', '198903112010122001', '2022-04-14 05:56:23', '198603072009121008'),
-(5, 1, 2, 2, '', '198903112010122001_pribadi_2.jpg', NULL, NULL, 'administrasi', '2022-04-13 05:08:43', '198903112010122001', NULL, NULL),
-(6, 1, 1, 1, '', '198903112010122001_pribadi_1.jpg', 1, '', 'administrasi', '2022-04-13 05:09:40', '198903112010122001', '2022-04-14 05:56:23', '198603072009121008'),
-(10, 1, 2, 21, '', '198903112010122001_dokumen_21.jpg', 1, '', 'pak', '2022-04-13 05:31:53', '198903112010122001', '2022-04-14 05:56:07', '198603072009121008');
+(1, 3, 2, 2, '', '198302092010121001_pribadi_2.pdf', NULL, NULL, 'administrasi', '2022-04-24 05:43:10', '198302092010121001', NULL, NULL),
+(2, 3, 1, 1, '', '198302092010121001_pribadi_1.jpg', NULL, NULL, 'administrasi', '2022-04-24 05:43:28', '198302092010121001', NULL, NULL),
+(3, 3, 1, 22, 'Link', 'https://www.w3schools.com/jquery/ajax_serialize.asp', NULL, NULL, 'pak', '2022-04-24 11:28:42', '198302092010121001', '2022-04-24 14:19:16', '1234567890'),
+(4, 3, 2, 3, 'File', '198302092010121001_dokumen_3.jpg', NULL, NULL, 'pak', '2022-04-24 11:29:11', '198302092010121001', '2022-04-24 13:43:12', '198302092010121001');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `dokumen_penilai`
+--
+
+CREATE TABLE `dokumen_penilai` (
+  `hid` int(11) NOT NULL,
+  `dokumen_id` int(11) DEFAULT NULL,
+  `penilai_id` int(11) DEFAULT NULL,
+  `status` int(11) DEFAULT NULL,
+  `notes` varchar(145) DEFAULT NULL,
+  `maxrev_date` date DEFAULT NULL,
+  `revised_date` date DEFAULT NULL,
+  `creation_date` datetime DEFAULT NULL,
+  `created_by` varchar(45) DEFAULT NULL,
+  `updated_by` varchar(45) DEFAULT NULL,
+  `updated_date` datetime DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `dokumen_penilai`
+--
+
+INSERT INTO `dokumen_penilai` (`hid`, `dokumen_id`, `penilai_id`, `status`, `notes`, `maxrev_date`, `revised_date`, `creation_date`, `created_by`, `updated_by`, `updated_date`) VALUES
+(1, 22, 4, 3, 'tes isian revisi', '2022-05-08', NULL, '2022-04-24 14:38:13', '1234567890', '1234567890', '2022-04-24 14:46:03'),
+(2, 3, 4, 1, '', NULL, NULL, '2022-04-24 14:58:04', '1234567890', NULL, NULL),
+(3, 22, 2, 1, '', NULL, NULL, '2022-04-24 15:30:43', '198603072009121008', '198603072009121008', '2022-04-24 15:35:52'),
+(4, 3, 2, 1, '', NULL, NULL, '2022-04-24 15:36:25', '198603072009121008', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -116,10 +143,38 @@ CREATE TABLE `dupak` (
 --
 
 INSERT INTO `dupak` (`hid`, `pemohon_id`, `kegiatan_id`, `nilai_ak`, `jml`, `total_ak`, `nilai_ak_final`, `total_ak_penilai`, `dokumen`, `isnilai`, `status`, `sumber`, `keterangan`, `creationdate`, `createdby`, `updateddate`, `updatedby`, `penilaiandate`, `penilaianby`) VALUES
-(1, 1, 63, 0.044, 56, 2.464, NULL, 2.464, NULL, NULL, 0, NULL, NULL, '2022-04-12 16:29:13', '198903112010122001', '2022-04-13 05:15:55', '198903112010122001', '2022-04-14 05:23:50', '198603072009121008'),
-(2, 1, 61, 0.088, 56, 4.928, NULL, 4.928, NULL, NULL, 0, NULL, NULL, '2022-04-12 16:31:19', '198903112010122001', NULL, NULL, '2022-04-14 05:56:07', '198603072009121008'),
-(3, 1, 75, 5, 1, 5, NULL, 5, NULL, NULL, 0, NULL, NULL, '2022-04-12 16:46:25', '198903112010122001', NULL, NULL, '2022-04-14 05:56:23', '198603072009121008'),
-(4, 1, 74, 0.02, 8, 0.16, NULL, 0.16, NULL, NULL, 0, NULL, NULL, '2022-04-13 03:06:44', '198903112010122001', '2022-04-13 05:16:23', '198903112010122001', '2022-04-14 05:55:57', '198603072009121008');
+(1, 3, 26, 0.128, 3, 0.384, NULL, 0.374, NULL, NULL, 0, NULL, NULL, '2022-04-24 05:43:45', '198302092010121001', NULL, NULL, '2022-04-24 18:35:24', 'admin'),
+(2, 3, 77, 12.5, 4, 50, NULL, 49.56, NULL, NULL, 0, NULL, NULL, '2022-04-24 05:43:56', '198302092010121001', NULL, NULL, '2022-04-24 18:35:05', 'admin');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `dupak_penilai`
+--
+
+CREATE TABLE `dupak_penilai` (
+  `hid` int(11) NOT NULL,
+  `dupak_id` int(11) DEFAULT NULL,
+  `penilai_id` int(11) DEFAULT NULL,
+  `total_nilai` double DEFAULT NULL,
+  `notes` varchar(145) DEFAULT NULL,
+  `status` int(11) DEFAULT NULL,
+  `maxrev_date` date DEFAULT NULL,
+  `creation_date` datetime DEFAULT NULL,
+  `created_by` varchar(45) DEFAULT NULL,
+  `updated_by` varchar(45) DEFAULT NULL,
+  `updated_date` datetime DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `dupak_penilai`
+--
+
+INSERT INTO `dupak_penilai` (`hid`, `dupak_id`, `penilai_id`, `total_nilai`, `notes`, `status`, `maxrev_date`, `creation_date`, `created_by`, `updated_by`, `updated_date`) VALUES
+(1, 1, 4, 0.384, 'tes isian revisi', 3, '2022-05-08', '2022-04-24 14:43:23', '1234567890', '1234567890', '2022-04-24 14:46:03'),
+(2, 2, 4, 50, '', 1, NULL, '2022-04-24 14:58:04', '1234567890', NULL, NULL),
+(3, 1, 2, 0.294, '', 1, NULL, '2022-04-24 15:30:43', '198603072009121008', '198603072009121008', '2022-04-24 15:35:52'),
+(4, 2, 2, 48, '', 1, NULL, '2022-04-24 15:36:25', '198603072009121008', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -1957,7 +2012,7 @@ CREATE TABLE `kamus_dupak` (
 
 INSERT INTO `kamus_dupak` (`hid`, `kegiatan_hid`, `output`, `orderby`, `created_by`, `creation_date`, `deleted_at`, `deleted_by`) VALUES
 (1, 75, 'Ijazah', NULL, 'admin', '2022-04-10 20:46:21', NULL, NULL),
-(2, 76, 'Buku', NULL, 'admin', '2022-04-10 20:48:03', NULL, NULL),
+(2, 76, 'Jurnal/Buku/Naskah', NULL, 'admin', '2022-04-24 11:11:41', NULL, NULL),
 (3, 77, 'Buku', NULL, 'admin', '2022-04-10 20:48:12', NULL, NULL),
 (4, 78, 'Jurnal/Buku/Naskah', NULL, 'admin', '2022-04-10 20:48:22', NULL, NULL),
 (5, 79, 'Buku', NULL, 'admin', '2022-04-10 20:48:34', NULL, NULL),
@@ -1976,7 +2031,8 @@ INSERT INTO `kamus_dupak` (`hid`, `kegiatan_hid`, `output`, `orderby`, `created_
 (18, 63, 'Laporan', NULL, 'admin', '2022-04-10 20:51:23', NULL, NULL),
 (19, 118, 'Ijazah', NULL, 'admin', '2022-04-11 14:40:06', NULL, NULL),
 (20, 61, 'Dokumentasi', NULL, 'admin', '2022-04-13 02:47:55', NULL, NULL),
-(21, 61, 'FLow Map', NULL, 'admin', '2022-04-13 02:48:15', NULL, NULL);
+(21, 61, 'FLow Map', NULL, 'admin', '2022-04-13 02:48:15', NULL, NULL),
+(22, 26, 'Laporan', NULL, 'admin', '2022-04-24 05:44:47', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -2138,6 +2194,35 @@ INSERT INTO `kamus_kegiatan` (`hid`, `kategori`, `unsur_kegiatan`, `subunsur_keg
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `kamus_templates`
+--
+
+CREATE TABLE `kamus_templates` (
+  `hid` int(11) NOT NULL,
+  `kegiatan_id` int(11) DEFAULT NULL,
+  `jenis_template` varchar(15) DEFAULT NULL,
+  `nama_template` varchar(145) DEFAULT NULL,
+  `file_template` text,
+  `creation_date` datetime DEFAULT NULL,
+  `created_by` varchar(45) DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `deleted_by` varchar(45) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `kamus_templates`
+--
+
+INSERT INTO `kamus_templates` (`hid`, `kegiatan_id`, `jenis_template`, `nama_template`, `file_template`, `creation_date`, `created_by`, `deleted_at`, `deleted_by`) VALUES
+(1, 76, 'Link', 'Link', 'https://www.detik.com/', '2022-04-24 10:31:04', 'admin', NULL, NULL),
+(2, 76, 'File', 'Buku', 'STLUD.docx', '2022-04-24 10:53:53', 'admin', NULL, NULL),
+(3, 26, 'File', 'Laporan', 'STLUD.docx', '2022-04-24 11:13:35', 'admin', NULL, NULL),
+(4, 26, 'Link', 'Laporan Link', 'https://themekita.com/demo-atlantis-bootstrap/livepreview/examples/demo1/components/font-awesome-icons.html', '2022-04-24 11:14:39', 'admin', NULL, NULL),
+(5, 77, 'Link', 'Jurnal Template', 'https://themekita.com/demo-atlantis-bootstrap/livepreview/examples/demo1/components/font-awesome-icons.html', '2022-04-24 11:15:40', 'admin', NULL, NULL);
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `kelompok`
 --
 
@@ -2228,7 +2313,47 @@ INSERT INTO `logs` (`id`, `username`, `CRUD`, `action`, `id_action`, `table_name
 (20, '198705052009011001', 'create', 'daftar dupak', 2, 'pemohon', '127.0.0.1', '2022-04-14 00:02:43', NULL),
 (21, 'admin', 'create', 'ditambahkan ke pleno', 1, 'pleno_lines', '127.0.0.1', '2022-04-14 22:52:46', NULL),
 (22, 'admin', 'create', 'diproses pleno', 1, 'pleno_lines', '127.0.0.1', '2022-04-14 23:10:48', NULL),
-(23, 'admin', 'create', 'proses bap', 1, 'pemohon', '127.0.0.1', '2022-04-15 00:37:27', NULL);
+(23, 'admin', 'create', 'proses bap', 1, 'pemohon', '127.0.0.1', '2022-04-15 00:37:27', NULL),
+(24, '198201112009121001', 'create', 'daftar dupak', 3, 'pemohon', '127.0.0.1', '2022-04-22 03:44:22', NULL),
+(25, '198903112010122001', 'create', 'daftar dupak', 4, 'pemohon', '127.0.0.1', '2022-04-22 03:45:51', NULL),
+(26, '198903112010122001', 'create', 'tambah butir', 5, 'dupak', '127.0.0.1', '2022-04-22 03:46:43', NULL),
+(27, '198903112010122001', 'create', 'tambah butir', 6, 'dupak', '127.0.0.1', '2022-04-22 03:47:05', NULL),
+(28, '198903112010122001', 'create', 'tambah butir', 7, 'dupak', '127.0.0.1', '2022-04-22 03:48:33', NULL),
+(29, '198903112010122001', 'create', 'upload dokumen', 11, 'dokumen', '127.0.0.1', '2022-04-22 03:53:41', NULL),
+(30, '198903112010122001', 'create', 'upload dokumen', 12, 'dokumen', '127.0.0.1', '2022-04-22 03:55:05', NULL),
+(31, '198903112010122001', 'create', 'upload dokumen', 13, 'dokumen', '127.0.0.1', '2022-04-22 03:55:20', NULL),
+(32, '198903112010122001', 'create', 'kirim dupak', 4, 'pemohon', '127.0.0.1', '2022-04-22 03:55:57', NULL),
+(33, 'admin', 'create', 'set penilai', 4, 'pemohon', '127.0.0.1', '2022-04-22 03:57:38', NULL),
+(34, '198603072009121008', 'create', 'approval butir dupak', 7, 'dupak', '127.0.0.1', '2022-04-22 04:07:19', NULL),
+(35, '198603072009121008', 'create', 'approval butir dupak', 5, 'dupak', '127.0.0.1', '2022-04-22 04:07:33', NULL),
+(36, '198603072009121008', 'create', 'approval butir dupak', 6, 'dupak', '127.0.0.1', '2022-04-22 04:07:51', NULL),
+(37, '198603072009121008', 'create', 'approval butir dupak', 7, 'dupak', '127.0.0.1', '2022-04-22 04:08:08', NULL),
+(38, '198603072009121008', 'create', 'selesaikan penilaian', 4, 'pemohon', '127.0.0.1', '2022-04-22 04:11:28', NULL),
+(39, 'admin', 'create', 'ditambahkan ke pleno', 2, 'pleno_lines', '127.0.0.1', '2022-04-22 04:13:36', NULL),
+(40, 'admin', 'create', 'diproses pleno', 2, 'pleno_lines', '127.0.0.1', '2022-04-22 04:15:48', NULL),
+(41, 'admin', 'create', 'proses bap', 4, 'pemohon', '127.0.0.1', '2022-04-22 04:17:39', NULL),
+(42, '198705052009011001', 'create', 'daftar dupak', 1, 'pemohon', '127.0.0.1', '2022-04-23 22:24:02', NULL),
+(43, '198102232010122001', 'create', 'daftar dupak', 2, 'pemohon', '127.0.0.1', '2022-04-23 22:33:17', NULL),
+(44, '198302092010121001', 'create', 'daftar dupak', 3, 'pemohon', '127.0.0.1', '2022-04-23 22:38:39', NULL),
+(45, '198302092010121001', 'create', 'tambah butir', 1, 'dupak', '127.0.0.1', '2022-04-23 22:43:45', NULL),
+(46, '198302092010121001', 'create', 'tambah butir', 2, 'dupak', '127.0.0.1', '2022-04-23 22:43:56', NULL),
+(47, '198302092010121001', 'create', 'upload dokumen', 3, 'dokumen', '127.0.0.1', '2022-04-24 04:28:42', NULL),
+(48, '198302092010121001', 'create', 'upload dokumen', 4, 'dokumen', '127.0.0.1', '2022-04-24 04:29:11', NULL),
+(49, '198302092010121001', 'create', 'kirim dupak', 3, 'pemohon', '127.0.0.1', '2022-04-24 04:29:19', NULL),
+(50, '198302092010121001', 'create', 'upload dokumen', 3, 'dokumen', '127.0.0.1', '2022-04-24 06:41:26', NULL),
+(51, '198302092010121001', 'create', 'upload dokumen', 3, 'dokumen', '127.0.0.1', '2022-04-24 06:42:40', NULL),
+(52, '198302092010121001', 'create', 'upload dokumen', 4, 'dokumen', '127.0.0.1', '2022-04-24 06:43:12', NULL),
+(53, '1234567890', 'create', 'approval butir dupak', 1, 'dupak', '127.0.0.1', '2022-04-24 07:19:16', NULL),
+(54, '1234567890', 'create', 'approval butir dupak', 1, 'dupak', '127.0.0.1', '2022-04-24 07:46:03', NULL),
+(55, '1234567890', 'create', 'approval butir dupak', 2, 'dupak', '127.0.0.1', '2022-04-24 07:58:04', NULL),
+(56, '1234567890', 'create', 'selesaikan penilaian', 3, 'pemohon', '127.0.0.1', '2022-04-24 08:15:38', NULL),
+(57, '198603072009121008', 'create', 'approval butir dupak', 1, 'dupak', '127.0.0.1', '2022-04-24 08:30:43', NULL),
+(58, '198603072009121008', 'create', 'approval butir dupak', 1, 'dupak', '127.0.0.1', '2022-04-24 08:35:52', NULL),
+(59, '198603072009121008', 'create', 'approval butir dupak', 2, 'dupak', '127.0.0.1', '2022-04-24 08:36:25', NULL),
+(60, '198603072009121008', 'create', 'selesaikan penilaian', 3, 'pemohon', '127.0.0.1', '2022-04-24 09:02:06', NULL),
+(61, 'admin', 'create', 'ditambahkan ke pleno', 3, 'pleno_lines', '127.0.0.1', '2022-04-24 09:20:27', NULL),
+(62, 'admin', 'create', 'diproses pleno', 3, 'pleno_lines', '127.0.0.1', '2022-04-24 11:36:38', NULL),
+(63, 'admin', 'create', 'proses bap', 3, 'pemohon', '127.0.0.1', '2022-04-24 11:46:34', NULL);
 
 -- --------------------------------------------------------
 
@@ -2313,6 +2438,7 @@ CREATE TABLE `pemohon` (
   `tgl_bap` date DEFAULT NULL,
   `no_bap` varchar(45) DEFAULT NULL,
   `tgl_surat` date DEFAULT NULL,
+  `bap_note` text,
   `pleno_id` int(11) DEFAULT NULL,
   `pleno_date` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -2321,9 +2447,34 @@ CREATE TABLE `pemohon` (
 -- Dumping data for table `pemohon`
 --
 
-INSERT INTO `pemohon` (`hid`, `periode_hid`, `nip`, `namalengkap`, `karpeg`, `pangkatgol`, `tmtgol`, `tempatlahir`, `tgllahir`, `jeniskelamin`, `pendidikan`, `jabatan`, `tmtjab`, `unitkerja`, `kabkota`, `kdjab`, `foto`, `spengantar_kab`, `spengantar_prov`, `skjabakhir`, `skgolakhir`, `pakakhir`, `status`, `notes`, `penilai_id`, `nippengusul`, `namapengusul`, `tempatpengusul`, `jabatanpengusul`, `tglpengusul`, `no_pak`, `hasil`, `creationdate`, `createdby`, `updateddate`, `updatedby`, `penilaiandate`, `tgl_bap`, `no_bap`, `tgl_surat`, `pleno_id`, `pleno_date`) VALUES
-(1, 2, '198903112010122001', 'HENNY CAHYANING DWIHARYANTI, A.Md', 'Q074904', 'Pengatur Tk. I (II/d)', '2015-04-01', 'BARITO KUALA', '1989-03-11', 'Perempuan', 'D-III/Sarmud/Akademi', 'Pranata Komputer Terampil', '2017-05-01', 'Perwakilan Badan Kependudukan dan Keluarga Berencana Nasional Provinsi Kalimantan Selatan', 'HULU SUNGAI SELATAN', 'JFT05007', NULL, NULL, NULL, NULL, NULL, NULL, 6, NULL, 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2022-04-11 13:46:29', '198903112010122001', '2022-04-15 07:37:27', 'admin', '2022-04-14 06:01:24', '2022-04-14', '001/2022', '2022-04-18', 1, '2022-04-15 05:52:46'),
-(2, 2, '198705052009011001', 'ANGGAR LINGGA RHOMADONA, S.Kom', 'P177902', 'Penata Muda Tk. I (III/b)', '2020-10-01', 'SUBANG', '1987-05-05', 'Laki-Laki', 'S1', 'Pranata Komputer Ahli Pertama', '2019-10-01', 'Biro Kepegawaian', 'TORAJA UTARA', 'JFT05004', NULL, NULL, NULL, NULL, NULL, NULL, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2022-04-14 07:02:43', '198705052009011001', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO `pemohon` (`hid`, `periode_hid`, `nip`, `namalengkap`, `karpeg`, `pangkatgol`, `tmtgol`, `tempatlahir`, `tgllahir`, `jeniskelamin`, `pendidikan`, `jabatan`, `tmtjab`, `unitkerja`, `kabkota`, `kdjab`, `foto`, `spengantar_kab`, `spengantar_prov`, `skjabakhir`, `skgolakhir`, `pakakhir`, `status`, `notes`, `penilai_id`, `nippengusul`, `namapengusul`, `tempatpengusul`, `jabatanpengusul`, `tglpengusul`, `no_pak`, `hasil`, `creationdate`, `createdby`, `updateddate`, `updatedby`, `penilaiandate`, `tgl_bap`, `no_bap`, `tgl_surat`, `bap_note`, `pleno_id`, `pleno_date`) VALUES
+(1, 2, '198705052009011001', 'ANGGAR LINGGA RHOMADONA, S.Kom', 'P177902', 'Penata Muda Tk. I (III/b)', '2020-10-01', 'SUBANG', '1987-05-05', 'Laki-Laki', 'S1', 'Pranata Komputer Ahli Pertama', '2019-10-01', 'Biro Kepegawaian', 'TORAJA UTARA', 'JFT05004', NULL, NULL, NULL, NULL, NULL, NULL, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2022-04-24 05:24:02', '198705052009011001', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(2, 2, '198102232010122001', 'DIAN FEBRIKA UTAMI, S.Kom. ', '263135', 'Penata Muda  (III/a)', '2015-10-01', 'KOTA PALEMBANG', '1981-02-23', 'Perempuan', 'S1', 'Pranata Komputer Ahli Pertama', '2015-10-01', 'Perwakilan Badan Kependudukan dan Keluarga Berencana Nasional Provinsi Riau', '', 'JFT05004', NULL, NULL, NULL, NULL, NULL, NULL, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2022-04-24 05:33:17', '198102232010122001', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(3, 2, '198302092010121001', 'FITRI SETIAWAN, S.Kom', 'Q035730', 'Penata Muda  (III/a)', '2017-10-01', 'KARANGANYAR', '1983-02-09', 'Laki-Laki', 'S1', 'Pranata Komputer Mahir', '2017-05-01', 'Perwakilan Badan Kependudukan dan Keluarga Berencana Nasional Provinsi Jawa Tengah', 'KOTA SEMARANG', 'JFT05006', NULL, NULL, NULL, NULL, NULL, NULL, 6, NULL, 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2022-04-24 05:38:39', '198302092010121001', '2022-04-24 18:46:34', 'admin', '2022-04-24 16:02:06', '2022-04-25', 'X12', '2022-04-26', 'notes bap', 1, '2022-04-24 16:20:27');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `pemohon_penilai`
+--
+
+CREATE TABLE `pemohon_penilai` (
+  `hid` int(11) NOT NULL,
+  `pemohon_id` int(11) DEFAULT NULL,
+  `penilai_id` int(11) DEFAULT NULL,
+  `penilai_ke` int(11) DEFAULT NULL,
+  `creation_date` datetime DEFAULT NULL,
+  `created_by` varchar(45) DEFAULT NULL,
+  `penilaian_date` datetime DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `pemohon_penilai`
+--
+
+INSERT INTO `pemohon_penilai` (`hid`, `pemohon_id`, `penilai_id`, `penilai_ke`, `creation_date`, `created_by`, `penilaian_date`) VALUES
+(1, 3, 2, 1, '2022-04-24 13:02:53', 'admin', '2022-04-24 16:02:06'),
+(2, 3, 4, 2, '2022-04-24 13:02:53', 'admin', '2022-04-24 15:15:38');
 
 -- --------------------------------------------------------
 
@@ -2352,7 +2503,8 @@ CREATE TABLE `penilai` (
 INSERT INTO `penilai` (`hid`, `jenjang`, `nip`, `namalengkap`, `jabatan`, `golonganpangkat`, `unitkerja`, `foto`, `sebagai`, `creationdate`, `createdby`) VALUES
 (1, 'Ahli Madya', '196411071991031004', 'Drs TAVIP AGUS RAYANTO, M.Si.', 'Sekretaris Utama', 'Pembina Utama (IV/e)', 'X', '19641107199103100410082020112324.jpeg', 'Ketua', '2021-08-21 21:34:25', 'admin'),
 (2, 'Ahli Madya', '198603072009121008', 'WAHYU HERYANSYAH, S.IP, M.Si', 'Analis Kepegawaian Ahli Muda', 'Penata Tk. I (III/d)', 'Biro Kepegawaian', '198603072009121008.jpg', 'Anggota', '2021-08-21 21:21:07', 'admin'),
-(3, 'Ahli Madya', '196803301993031001', 'VIKTOR HASIHOLAN SIBURIAN, S.E., M.Si.', 'Kepala Biro Sumber Daya Manusia', 'Pembina Utama Muda (IV/c)', 'Biro Sumber Daya Manusia', '19680330199303100110082020112220.jpeg', 'Anggota', '2022-04-08 03:31:23', 'admin');
+(3, 'Ahli Madya', '196803301993031001', 'VIKTOR HASIHOLAN SIBURIAN, S.E., M.Si.', 'Kepala Biro Sumber Daya Manusia', 'Pembina Utama Muda (IV/c)', 'Biro Sumber Daya Manusia', '19680330199303100110082020112220.jpeg', 'Anggota', '2022-04-08 03:31:23', 'admin'),
+(4, 'Ahli Pertama', '1234567890', 'Nama Penilai Non SIMSDM', 'Auditor Public', 'IVa (Pembina Utama)', 'Instansi Luar', NULL, 'Anggota', '2022-04-24 11:54:55', 'admin');
 
 -- --------------------------------------------------------
 
@@ -2435,7 +2587,9 @@ CREATE TABLE `pleno_lines` (
 --
 
 INSERT INTO `pleno_lines` (`hid`, `pleno_id`, `pemohon_id`, `status`, `notes`, `creation_date`, `created_by`, `updated_by`, `updated_date`) VALUES
-(1, 1, 1, 1, NULL, '2022-04-15 05:52:46', 'admin', 'admin', '2022-04-15 06:10:48');
+(1, 1, 1, 1, NULL, '2022-04-15 05:52:46', 'admin', 'admin', '2022-04-15 06:10:48'),
+(2, 1, 4, 1, NULL, '2022-04-22 11:13:36', 'admin', 'admin', '2022-04-22 11:15:48'),
+(3, 1, 3, 1, NULL, '2022-04-24 16:20:27', 'admin', 'admin', '2022-04-24 18:36:38');
 
 -- --------------------------------------------------------
 
@@ -2495,8 +2649,12 @@ INSERT INTO `users` (`Id`, `Username`, `EmployeeId`, `Password`, `DisplayName`, 
 (3, 'admin', NULL, '5b55f03446dcb74e2ad39dd74c22172f', 'Super Admin', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'profil_admin.jpg', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
 (25, 'admin.sekretariat2', NULL, 'd41d8cd98f00b204e9800998ecf8427e', 'Admin Sekretariat 2', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 2, '2021-08-20 23:09:10', 'admin', '2021-08-20 23:13:42', 'admin', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
 (26, 'admin.sekretariat1', NULL, '25d55ad283aa400af464c76d713c07ad', 'Admin Sekretariat 2', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, '2022-04-02 10:56:36', 'admin', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
-(27, '198705052009011001', '198705052009011001', '0a5025d66258040d2e0000f5b4da65cc', 'ANGGAR LINGGA RHOMADONA, S.Kom', 'Pranata Komputer Ahli Pertama', 'JFT05004', 'Penata Muda Tk. I (III/b)', 8, 3319000, '0102000000', 'Biro Kepegawaian', 'SULAWESI SELATAN', 'TORAJA UTARA', 'DENDE&#039; PIONGAN NAPO', 'PARANDANGAN', NULL, NULL, NULL, '2022-04-02 15:08:50', '198705052009011001', '2022-04-14 07:02:40', NULL, NULL, '08121899430511', 'anggarlingga87ubah@gmail.com', '198705052009011001.JPG', 'SUBANG', '1987-05-05', 'Laki-Laki', 'S1', NULL, NULL, '2020-10-01', '2019-10-01', 'P177902', '198603072009121008', '198603072009121008', 'WAHYU HERYANSYAH, S.IP, M.Si', 'Analis Kepegawaian Ahli Muda', 'Penata Tk. I (III/d)'),
-(29, '198903112010122001', '198903112010122001', 'b11c3e95f2a7119a5ff2da95456941be', 'HENNY CAHYANING DWIHARYANTI, A.Md', 'Pranata Komputer Terampil', 'JFT05007', 'Pengatur Tk. I (II/d)', 6, 2702000, '000D000000', 'Perwakilan Badan Kependudukan dan Keluarga Berencana Nasional Provinsi Kalimantan Selatan', 'KALIMANTAN SELATAN', 'HULU SUNGAI SELATAN', 'KANDANGAN', 'KANDANGAN UTARA', NULL, NULL, NULL, '2022-04-10 20:57:50', '198903112010122001', '2022-04-15 06:04:56', NULL, NULL, '08115037200', 'henny.dwiharyanti@gmail.com', '198903112010122001.jpg', 'BARITO KUALA', '1989-03-11', 'Perempuan', 'D-III/Sarmud/Akademi', NULL, NULL, '2015-04-01', '2017-05-01', 'Q074904', NULL, NULL, NULL, NULL, NULL);
+(27, '198705052009011001', '198705052009011001', '25d55ad283aa400af464c76d713c07ad', 'ANGGAR LINGGA RHOMADONA, S.Kom', 'Pranata Komputer Ahli Pertama', 'JFT05004', 'Penata Muda Tk. I (III/b)', 8, 3319000, '0102000000', 'Biro Kepegawaian', 'SULAWESI SELATAN', 'TORAJA UTARA', 'DENDE&#039; PIONGAN NAPO', 'PARANDANGAN', NULL, NULL, NULL, '2022-04-02 15:08:50', '198705052009011001', '2022-04-24 05:23:55', NULL, NULL, '08121899430511', 'anggarlingga87ubah@gmail.com', '198705052009011001.JPG', 'SUBANG', '1987-05-05', 'Laki-Laki', 'S1', NULL, NULL, '2020-10-01', '2019-10-01', 'P177902', '198603072009121008', '198603072009121008', 'WAHYU HERYANSYAH, S.IP, M.Si', 'Analis Kepegawaian Ahli Muda', 'Penata Tk. I (III/d)'),
+(29, '198903112010122001', '198903112010122001', 'b11c3e95f2a7119a5ff2da95456941be', 'HENNY CAHYANING DWIHARYANTI, A.Md', 'Pranata Komputer Terampil', 'JFT05007', 'Pengatur Tk. I (II/d)', 6, 2702000, '000D000000', 'Perwakilan Badan Kependudukan dan Keluarga Berencana Nasional Provinsi Kalimantan Selatan', 'KALIMANTAN SELATAN', 'HULU SUNGAI SELATAN', 'KANDANGAN', 'KANDANGAN UTARA', NULL, NULL, NULL, '2022-04-10 20:57:50', '198903112010122001', '2022-04-15 06:04:56', NULL, NULL, '08115037200', 'henny.dwiharyanti@gmail.com', '198903112010122001.jpg', 'BARITO KUALA', '1989-03-11', 'Perempuan', 'D-III/Sarmud/Akademi', NULL, NULL, '2015-04-01', '2017-05-01', 'Q074904', NULL, NULL, NULL, NULL, NULL),
+(30, '198201112009121001', '198201112009121001', '25d55ad283aa400af464c76d713c07ad', 'ANGGA KRIS ANDHIKA, ST', 'Pranata Komputer Ahli Pertama', 'JFT05004', 'Penata Muda Tk. I (III/b)', 8, 3319000, '0605000000', 'Direktorat Teknologi Informasi dan Dokumentasi', 'DKI JAKARTA', 'JAKARTA TIMUR', 'MAKASAR', 'HALIM PERDANA ', NULL, NULL, NULL, '2022-04-22 10:44:15', '198201112009121001', NULL, NULL, NULL, '087887349444', 'anggakris@bkkbn.go.id', '198201112009121001.jpg', 'BOGOR', '1982-01-11', 'Laki-Laki', 'S1', NULL, NULL, '2016-10-01', '2012-07-01', '0244/KEP/KARPEG/2012', NULL, NULL, NULL, NULL, NULL),
+(31, '198102232010122001', '198102232010122001', '25d55ad283aa400af464c76d713c07ad', 'DIAN FEBRIKA UTAMI, S.Kom. ', 'Pranata Komputer Ahli Pertama', 'JFT05004', 'Penata Muda  (III/a)', 8, 3319000, '000T000000', 'Perwakilan Badan Kependudukan dan Keluarga Berencana Nasional Provinsi Riau', 'RIAU', '', 'SUKAJADI', 'SUKAJADI', NULL, NULL, NULL, '2022-04-24 05:33:11', '198102232010122001', NULL, NULL, NULL, '082173080567', 'm.attalaharaudhowijaya@ymail.com', '19810223201012200123072020063628.jpg', 'KOTA PALEMBANG', '1981-02-23', 'Perempuan', 'S1', NULL, NULL, '2015-10-01', '2015-10-01', '263135', NULL, NULL, NULL, NULL, NULL),
+(32, '198302092010121001', '198302092010121001', '25d55ad283aa400af464c76d713c07ad', 'FITRI SETIAWAN, S.Kom', 'Pranata Komputer Mahir', 'JFT05006', 'Penata Muda  (III/a)', 7, 2928000, '000B000000', 'Perwakilan Badan Kependudukan dan Keluarga Berencana Nasional Provinsi Jawa Tengah', 'JAWA TENGAH', 'KOTA SEMARANG', 'SEMARANG TENGAH', 'PANDANSARI', NULL, NULL, NULL, '2022-04-24 05:38:35', '198302092010121001', '2022-04-24 13:13:32', NULL, NULL, '085741373829', 'fitri.setiawan@bkkbn.go.id', '198302092010121001.jpg', 'KARANGANYAR', '1983-02-09', 'Laki-Laki', 'S1', NULL, NULL, '2017-10-01', '2017-05-01', 'Q035730', NULL, NULL, NULL, NULL, NULL),
+(33, '1234567890', '1234567890', '25d55ad283aa400af464c76d713c07ad', 'Nama Penilai Non SIMSDM', 'Auditor Public', NULL, 'IVa (Pembina Utama)', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 3, '2022-04-24 11:54:42', 'admin', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 
 --
 -- Indexes for dumped tables
@@ -2518,12 +2676,24 @@ ALTER TABLE `dokumen`
   ADD KEY `pemohon_hid` (`pemohon_hid`);
 
 --
+-- Indexes for table `dokumen_penilai`
+--
+ALTER TABLE `dokumen_penilai`
+  ADD PRIMARY KEY (`hid`);
+
+--
 -- Indexes for table `dupak`
 --
 ALTER TABLE `dupak`
   ADD PRIMARY KEY (`hid`),
   ADD KEY `pemohon_id` (`pemohon_id`),
   ADD KEY `kegiatan_id` (`kegiatan_id`);
+
+--
+-- Indexes for table `dupak_penilai`
+--
+ALTER TABLE `dupak_penilai`
+  ADD PRIMARY KEY (`hid`);
 
 --
 -- Indexes for table `history`
@@ -2576,6 +2746,12 @@ ALTER TABLE `kamus_kegiatan`
   ADD KEY `jabatan_id` (`jabatan_id`);
 
 --
+-- Indexes for table `kamus_templates`
+--
+ALTER TABLE `kamus_templates`
+  ADD PRIMARY KEY (`hid`);
+
+--
 -- Indexes for table `kelompok`
 --
 ALTER TABLE `kelompok`
@@ -2616,6 +2792,12 @@ ALTER TABLE `pemohon`
   ADD KEY `periode_hid` (`periode_hid`),
   ADD KEY `nip` (`nip`),
   ADD KEY `penilai_id` (`penilai_id`);
+
+--
+-- Indexes for table `pemohon_penilai`
+--
+ALTER TABLE `pemohon_penilai`
+  ADD PRIMARY KEY (`hid`);
 
 --
 -- Indexes for table `penilai`
@@ -2664,12 +2846,24 @@ ALTER TABLE `bantuan`
 -- AUTO_INCREMENT for table `dokumen`
 --
 ALTER TABLE `dokumen`
-  MODIFY `hid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `hid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
+-- AUTO_INCREMENT for table `dokumen_penilai`
+--
+ALTER TABLE `dokumen_penilai`
+  MODIFY `hid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `dupak`
 --
 ALTER TABLE `dupak`
+  MODIFY `hid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `dupak_penilai`
+--
+ALTER TABLE `dupak_penilai`
   MODIFY `hid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
@@ -2706,13 +2900,19 @@ ALTER TABLE `jenjang_jabatan`
 -- AUTO_INCREMENT for table `kamus_dupak`
 --
 ALTER TABLE `kamus_dupak`
-  MODIFY `hid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `hid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 
 --
 -- AUTO_INCREMENT for table `kamus_kegiatan`
 --
 ALTER TABLE `kamus_kegiatan`
   MODIFY `hid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=123;
+
+--
+-- AUTO_INCREMENT for table `kamus_templates`
+--
+ALTER TABLE `kamus_templates`
+  MODIFY `hid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `kelompok`
@@ -2730,7 +2930,7 @@ ALTER TABLE `kelompok_lines`
 -- AUTO_INCREMENT for table `logs`
 --
 ALTER TABLE `logs`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=64;
 
 --
 -- AUTO_INCREMENT for table `mdok`
@@ -2748,13 +2948,19 @@ ALTER TABLE `notifikasi`
 -- AUTO_INCREMENT for table `pemohon`
 --
 ALTER TABLE `pemohon`
+  MODIFY `hid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT for table `pemohon_penilai`
+--
+ALTER TABLE `pemohon_penilai`
   MODIFY `hid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `penilai`
 --
 ALTER TABLE `penilai`
-  MODIFY `hid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `hid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `periode`
@@ -2772,13 +2978,13 @@ ALTER TABLE `pleno_header`
 -- AUTO_INCREMENT for table `pleno_lines`
 --
 ALTER TABLE `pleno_lines`
-  MODIFY `hid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `hid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `Id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
+  MODIFY `Id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

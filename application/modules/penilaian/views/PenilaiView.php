@@ -19,7 +19,13 @@
                                             <a href="<?php echo base_url(); ?>penilaian/modal?action=<?php echo $action; ?>" class="btn btn-secondary btn-round ls-modal">
                                                 <span class="btn-label">
                                                     <i class="fa fa-plus"></i>
-                                                </span> Tambah</a>
+                                                </span> SIMSDM
+											</a>
+											<a href="<?php echo base_url(); ?>penilaian/modal?action=penilainon" class="btn btn-info btn-round ls-modal">
+                                                <span class="btn-label">
+                                                    <i class="fa fa-plus"></i>
+                                                </span> Non SIMSDM
+											</a>
                                         </div>
                                     </div>
                                 </div>
@@ -30,7 +36,6 @@
                                             <thead>
                                                 <tr>
                                                 <th scope="col" width="10%">Action</th>
-                                                <th scope="col">Foto</th>
                                                 <th scope="col">NIP</th>
                                                 <th scope="col">Nama Lengkap</th>
                                                 <th scope="col">Golongan (Pangkat)</th>								
@@ -52,10 +57,12 @@
                                                     echo '<a href="' . base_url() . 'penilaian/modal?hid=' . $rw->hid . '&action=update' . $action . '" class="btn btn-link btn-primary btn-lg ls-modal"><i class="fa fa-edit"></i></a>';
                                                     echo '<a href="" class="btn btn-link btn-danger del" data-id="' . md5($rw->hid). '"><i class="fa fa-trash"></a>';
                                                     echo '</div></td>';
-                                                    echo '<td>';
+                                                    /*
+													echo '<td>';
                                                     echo '<div class="avatar avatar-xl"><img src="'.URL_FOTO_SIMSDM.$rw->foto.'" alt="'.$rw->namalengkap.'" class="avatar-img rounded-circle"></div>';
                                                     echo '</td>';
-                                                    echo '<td>'.$rw->nip.'</td>';
+                                                    */
+													echo '<td>'.$rw->nip.'</td>';
                                                     echo '<td>'.$rw->namalengkap.'</td>';
                                                     echo '<td>'.$rw->golonganpangkat.'</td>';
                                                     echo '<td>'.$rw->jabatan.'</td>';

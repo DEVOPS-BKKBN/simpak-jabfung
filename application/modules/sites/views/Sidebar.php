@@ -83,7 +83,7 @@
 					<?php } ?>
 					<?php if ($this->session->userdata('leveluser')=='3'){ 
 						// baca num dupak penilaian belum di proses
-						$sql="SELECT COUNT(*) judul FROM pemohon WHERE status='3' AND penilaiandate IS NULL AND penilai_id=(SELECT hid FROM penilai WHERE nip='".$this->session->userdata('userName')."')";
+						$sql="SELECT COUNT(*) judul FROM pemohon_penilai WHERE penilaian_date IS NULL AND penilai_id=(SELECT hid FROM penilai WHERE nip='".$this->session->userdata('userName')."')";
 						$num=$this->ReferensiModel->LoadSQL($sql);
 					?>
 						<li class="nav-item submenu <?php if ($urlmenu=='penilaian' || $urlmenu=='ongoing' || $urlmenu=='finish') echo 'active'; ?>">
@@ -145,13 +145,13 @@
 								</ul>
 							</div>
 						</li>
-						<li class="nav-item submenu <?php if ($urlmenu=='dtlpleno' || $urlmenu=='periode' || $urlmenu=='penilai'  || $urlmenu=='bap' || $urlmenu=='pleno' || $urlmenu=='distribusi' || $urlmenu=='dtldistribusi') echo 'active'; ?>">
+						<li class="nav-item submenu <?php if ($urlmenu=='penilaianpleno' || $urlmenu=='dtlpleno' || $urlmenu=='periode' || $urlmenu=='penilai'  || $urlmenu=='bap' || $urlmenu=='pleno' || $urlmenu=='distribusi' || $urlmenu=='dtldistribusi') echo 'active'; ?>">
 							<a data-toggle="collapse" href="#forms" class="">
 								<i class="fas fa-pen-square"></i>
 								<p>Penilaian</p>
 								<span class="caret"></span>
 							</a>
-							<div class="collapse <?php if ($urlmenu=='dtlpleno' || $urlmenu=='periode' || $urlmenu=='penilai'  || $urlmenu=='bap' || $urlmenu=='pleno' || $urlmenu=='distribusi' || $urlmenu=='dtldistribusi') echo 'show'; ?>" id="forms">
+							<div class="collapse <?php if ($urlmenu=='penilaianpleno' || $urlmenu=='dtlpleno' || $urlmenu=='periode' || $urlmenu=='penilai'  || $urlmenu=='bap' || $urlmenu=='pleno' || $urlmenu=='distribusi' || $urlmenu=='dtldistribusi') echo 'show'; ?>" id="forms">
 								<ul class="nav nav-collapse">
 									<li>
 										<a href="<?php echo base_url(); ?>penilaian/periode">

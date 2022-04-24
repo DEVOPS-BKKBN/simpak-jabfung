@@ -103,14 +103,15 @@
 												 <table class="table table-striped table-bordered">
 														<thead>
 															<tr>
-																<th>NO</th><th>BUTIR KEGIATAN</th><th>OUTPUT</th><th>ANGKA KREDIT</th><th>JUMLAH</th><th>TOTAL</th><th>DOKUMEN FISIK</th>
+																<th>NO</th><th>BUTIR KEGIATAN</th><th>OUTPUT</th><th>ANGKA KREDIT</th><th>JUMLAH</th><th>TOTAL</th><th>TOTAL PENILAI</th><th>DOKUMEN FISIK</th>
 															</tr>
 														</thead>
 														<tbody>												
-															<tr><th colspan="8">A. KEGIATAN UTAMA</th></tr>
+															<tr><th colspan="9">A. KEGIATAN UTAMA</th></tr>
 															<?php
 																$n=0;
-																$cn2=$this->db->query("SELECT a.*,b.butir_kegiatan,b.output FROM dupak a JOIN kamus_kegiatan b ON a.kegiatan_id=b.hid WHERE pemohon_id=".$this->db->escape($rw->hid)." AND kategori='Utama' ORDER BY a.hid");
+																
+																$cn2=$this->db->query("SELECT a.*,b.butir_kegiatan,b.output,(SELECT total_nilai FROM dupak_penilai WHERE dupak_id=a.hid AND penilai_id='$penilaiid' )ttlpenilai FROM dupak a JOIN kamus_kegiatan b ON a.kegiatan_id=b.hid WHERE pemohon_id=".$this->db->escape($rw->hid)." AND kategori='Utama' ORDER BY a.hid");
 																foreach ($cn2->result() as $rw2){
 																	$n++;
 																	echo '<tr>';
@@ -120,9 +121,11 @@
 																	echo '<td>'.$rw2->nilai_ak.'</td>';
 																	echo '<td>'.$rw2->jml.'</td>';
 																	echo '<td>'.$rw2->total_ak.'</td>';
+																	echo '<td>'.$rw2->ttlpenilai.'</td>';
 																	echo '<td><ul class="list-group list-group-full">';
 																			$sql="SELECT a.*,(SELECT MAX(file_name) FROM dokumen WHERE pemohon_hid='".$rw->hid."' AND dokumen_hid=a.hid) filename,
-																			(SELECT MAX(status_approval) FROM dokumen WHERE pemohon_hid='".$rw->hid."' AND dokumen_hid=a.hid) status_approval,(SELECT MAX(notes_approval) FROM dokumen WHERE pemohon_hid='".$rw->hid."' AND dokumen_hid=a.hid) notes_approval
+																			(SELECT MAX(status) FROM dokumen_penilai WHERE penilai_id='".$penilaiid."' AND dokumen_id=a.hid) status_approval,
+																			(SELECT MAX(notes) FROM dokumen_penilai WHERE penilai_id='".$penilaiid."' AND dokumen_id=a.hid) notes_approval
 																			FROM kamus_dupak a WHERE kegiatan_hid='".$rw2->kegiatan_id."'";$cn3 = $this->db->query($sql);
 																			foreach ($cn3->result() as $rw3){
 																				if ($rw3->filename!='') echo '<li class="list-group-item d-flex justify-content-between align-items-center list-group-item-success">'.$rw3->output;
@@ -143,10 +146,10 @@
 																	echo '</tr>';
 																}
 															?>
-															<tr><th colspan="8">B. KEGIATAN PENUNJANG</th></tr>
+															<tr><th colspan="9">B. KEGIATAN PENUNJANG</th></tr>
 															<?php
 																$n=0;
-																$cn2=$this->db->query("SELECT a.*,b.butir_kegiatan,b.output FROM dupak a JOIN kamus_kegiatan b ON a.kegiatan_id=b.hid WHERE pemohon_id=".$this->db->escape($rw->hid)." AND kategori='Penunjang' ORDER BY a.hid");
+																$cn2=$this->db->query("SELECT a.*,b.butir_kegiatan,b.output,(SELECT total_nilai FROM dupak_penilai WHERE dupak_id=a.hid AND penilai_id='$penilaiid' )ttlpenilai FROM dupak a JOIN kamus_kegiatan b ON a.kegiatan_id=b.hid WHERE pemohon_id=".$this->db->escape($rw->hid)." AND kategori='Penunjang' ORDER BY a.hid");
 																foreach ($cn2->result() as $rw2){
 																	$n++;
 																	echo '<tr>';
@@ -156,21 +159,24 @@
 																	echo '<td>'.$rw2->nilai_ak.'</td>';
 																	echo '<td>'.$rw2->jml.'</td>';
 																	echo '<td>'.$rw2->total_ak.'</td>';
+																	echo '<td>'.$rw2->ttlpenilai.'</td>';
 																	echo '<td><ul class="list-group list-group-full">';
 																			$sql="SELECT a.*,(SELECT MAX(file_name) FROM dokumen WHERE pemohon_hid='".$rw->hid."' AND dokumen_hid=a.hid) filename,
-																			(SELECT MAX(status_approval) FROM dokumen WHERE pemohon_hid='".$rw->hid."' AND dokumen_hid=a.hid) status_approval,(SELECT MAX(notes_approval) FROM dokumen WHERE pemohon_hid='".$rw->hid."' AND dokumen_hid=a.hid) notes_approval
-																			FROM kamus_dupak a WHERE kegiatan_hid='".$rw2->kegiatan_id."'";
-																			$cn3 = $this->db->query($sql);
+																			(SELECT MAX(status) FROM dokumen_penilai WHERE penilai_id='".$penilaiid."' AND dokumen_id=a.hid) status_approval,
+																			(SELECT MAX(notes) FROM dokumen_penilai WHERE penilai_id='".$penilaiid."' AND dokumen_id=a.hid) notes_approval
+																			FROM kamus_dupak a WHERE kegiatan_hid='".$rw2->kegiatan_id."'";$cn3 = $this->db->query($sql);
 																			foreach ($cn3->result() as $rw3){
 																				if ($rw3->filename!='') echo '<li class="list-group-item d-flex justify-content-between align-items-center list-group-item-success">'.$rw3->output;
 																					else echo '<li class="list-group-item d-flex justify-content-between align-items-center">'.$rw3->output;
-																				if ($rw3->filename!='' && $rw3->status_approval=='') echo '<a href="'.base_url().'penilai/modal?action=viewdokumennilai&tab=task&hid='.$rw3->hid.'&phid='.$phid.'" class="ls-modal"><span class="badge badge-info badge-pill"><i class="ti-zoom-in text"></i> APPROVAL</span></a>';
+																				if ($rw3->filename!='' && $rw3->status_approval=='') echo '<a href="'.base_url().'penilai/modal?action=viewdokumennilai&tab=task&hid='.$rw3->hid.'&phid='.$phid.'" class="ls-modal"><span class="badge badge-info badge-pill ml-2"><i class="ti-zoom-in text"></i> APPROVAL</span></a>';
 																				if ($rw3->status_approval=='2') { echo '<a href="'.base_url().'penilai/modal?action=viewdokumennilai&tab=task&hid='.$rw3->hid.'&phid='.$phid.'" class="ls-modal"><span class="badge badge-danger badge-pill ml-2"><i class="ti-close text"></i> DITOLAK</span></a>';																			
+																				}
+																				if ($rw3->status_approval=='3') { echo '<a href="'.base_url().'penilai/modal?action=viewdokumennilai&tab=task&hid='.$rw3->hid.'&phid='.$phid.'" class="ls-modal"><span class="badge badge-warning badge-pill ml-2"><i class="ti-close text"></i> REVISI</span></a>';																			
 																				}
 																				if ($rw3->status_approval=='1') echo '<a href="'.base_url().'penilai/modal?action=viewdokumennilai&tab=task&hid='.$rw3->hid.'&phid='.$phid.'" class="ls-modal"><span class="badge badge-success badge-pill ml-2"><i class="ti-check text"></i> DISETUJUI</span></a>';
 																				echo '</li>';
 																				
-																				if ($rw3->status_approval=='2') echo '<li class="list-group-item d-flex justify-content-between align-items-center list-group-item-danger"><small>Notes: '.$rw3->notes_approval.'</small></li>';
+																				if ($rw3->status_approval=='2' || $rw3->status_approval=='3') echo '<li class="list-group-item d-flex justify-content-between align-items-center list-group-item-danger"><small>Notes: '.$rw3->notes_approval.'</small></li>';
 																			}
 																	echo '</ul></td>';
 																																		
@@ -190,10 +196,12 @@
 									<div class="table-responsive">
 										 <?php if ($status==1){ ?><button type="button" class="btn waves-effect waves-light btn-info btn-sm mb-4" id="btnkirim" data-id="<?php echo $rw->hid; ?>">KIRIM KE ADMIN SEKRETARIAT</button><?php } ?>
 										 <?php
-											$sql="SELECT ROUND(SUM(CASE WHEN kategori='Utama' THEN total_ak ELSE 0 END),3) utama,
-ROUND(SUM(CASE WHEN kategori='Penunjang' THEN total_ak ELSE 0 END),3) penunjang,
-ROUND(SUM(total_ak),3) total
- FROM dupak a JOIN kamus_kegiatan b ON a.kegiatan_id=b.hid WHERE pemohon_id='".$rw->hid."'";
+											$sql="SELECT ROUND(SUM(CASE WHEN kategori='Utama' THEN total_nilai ELSE 0 END),3) utama,
+ROUND(SUM(CASE WHEN kategori='Penunjang' THEN total_nilai ELSE 0 END),3) penunjang,
+ROUND(SUM(total_nilai),3) total
+ FROM dupak a JOIN kamus_kegiatan b ON a.kegiatan_id=b.hid 
+ JOIN dupak_penilai c ON a.hid=c.dupak_id
+ WHERE pemohon_id='".$rw->hid."' AND penilai_id='$penilaiid'";
 											$cn2=$this->db->query($sql);
 											$rw2=$cn2->row();
  

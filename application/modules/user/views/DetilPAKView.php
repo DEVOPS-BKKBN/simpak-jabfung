@@ -12,6 +12,7 @@
 						echo $this->session->flashdata('response'); 
 						$sql="SELECT COUNT(*) judul FROM kamus_kegiatan a JOIN jabatan b ON a.jabatan_id=b.hid 
 WHERE b.hid IN(SELECT hid FROM jabatan WHERE kode_jab='".$rw->kdjab."' AND deleted_at IS NULL) AND kategori='Utama' ORDER BY a.hid";
+
 						
 						$num=$this->ReferensiModel->LoadSQL($sql);
 
@@ -128,11 +129,11 @@ WHERE b.hid IN(SELECT hid FROM jabatan WHERE kode_jab='".$rw->kdjab."' AND delet
 										 <table class="table table-striped table-bordered">
 												<thead>
 													<tr>
-														<th>NO</th><th>BUTIR KEGIATAN</th><th>OUTPUT</th><th>ANGKA KREDIT</th><th>JUMLAH</th><th>TOTAL</th><th>DOKUMEN FISIK</th><?php if ($status==1){ ?><th>AKSI</th><?php } ?>
+														<th>NO</th><th>BUTIR KEGIATAN</th><th>OUTPUT</th><th>ANGKA KREDIT</th><th>JUMLAH</th><th>TOTAL</th><th>TEMPLATE DOKUMEN</th><th>DOKUMEN FISIK</th><?php if ($status==1){ ?><th>AKSI</th><?php } ?>
 													</tr>
 												</thead>
 												<tbody>												
-													<tr><th <?php if ($status==1){?>colspan="8"<?php } else  echo 'colspan="7"';?>>A. KEGIATAN UTAMA</th></tr>
+													<tr><th <?php if ($status==1){?>colspan="9"<?php } else  echo 'colspan="8"';?>>A. KEGIATAN UTAMA</th></tr>
 													<?php
 														$n=0;
 														$cn2=$this->db->query("SELECT a.*,b.butir_kegiatan,b.output FROM dupak a JOIN kamus_kegiatan b ON a.kegiatan_id=b.hid WHERE pemohon_id=".$this->db->escape($rw->hid)." AND kategori='Utama' ORDER BY a.hid");
@@ -145,6 +146,19 @@ WHERE b.hid IN(SELECT hid FROM jabatan WHERE kode_jab='".$rw->kdjab."' AND delet
 															echo '<td>'.$rw2->nilai_ak.'</td>';
 															echo '<td>'.$rw2->jml.'</td>';
 															echo '<td>'.$rw2->total_ak.'</td>';
+															echo '<td><ul class="list-group list-group-full">';
+																	$sql="SELECT * FROM kamus_templates WHERE kegiatan_id='".$rw2->kegiatan_id."'";
+																	$cn3 = $this->db->query($sql);
+																	foreach ($cn3->result() as $rw3){
+																		echo '<li class="list-group-item d-flex justify-content-between align-items-center">'.$rw3->nama_template;
+																		if ($rw3->jenis_template=='File')
+																			echo '<a href="'.base_url().'assets/uploads/templates/'.$rw3->file_template.'" target="blank"><span class="badge badge-info badge-pill ml-2"><i class="ti-zoom-in text"></i> UNDUH</span></a></li>';
+																			else
+																			echo '<a href="'.$rw3->file_template.'" target="blank"><span class="badge badge-info badge-pill ml-2"><i class="ti-zoom-in text"></i> UNDUH</span></a></li>';
+																				
+																		
+																	}
+															echo '</ul></td>';
 															echo '<td><ul class="list-group list-group-full">';
 																	$sql="SELECT a.*,(SELECT MAX(file_name) FROM dokumen WHERE pemohon_hid='".$rw->hid."' AND dokumen_hid=a.hid) filename FROM kamus_dupak a WHERE kegiatan_hid='".$rw2->kegiatan_id."'";
 																	$cn3 = $this->db->query($sql);
@@ -165,7 +179,7 @@ WHERE b.hid IN(SELECT hid FROM jabatan WHERE kode_jab='".$rw->kdjab."' AND delet
 															echo '</tr>';
 														}
 													?>
-													<tr><th colspan="8">B. KEGIATAN PENUNJANG</th></tr>
+													<tr><th <?php if ($status==1){?>colspan="9"<?php } else  echo 'colspan="8"';?>>B. KEGIATAN PENUNJANG</th></tr>
 													<?php
 														$n=0;
 														$cn2=$this->db->query("SELECT a.*,b.butir_kegiatan,b.output FROM dupak a JOIN kamus_kegiatan b ON a.kegiatan_id=b.hid WHERE pemohon_id=".$this->db->escape($rw->hid)." AND kategori='Penunjang' ORDER BY a.hid");
@@ -178,6 +192,19 @@ WHERE b.hid IN(SELECT hid FROM jabatan WHERE kode_jab='".$rw->kdjab."' AND delet
 															echo '<td>'.$rw2->nilai_ak.'</td>';
 															echo '<td>'.$rw2->jml.'</td>';
 															echo '<td>'.$rw2->total_ak.'</td>';
+															echo '<td><ul class="list-group list-group-full">';
+																	$sql="SELECT * FROM kamus_templates WHERE kegiatan_id='".$rw2->kegiatan_id."'";
+																	$cn3 = $this->db->query($sql);
+																	foreach ($cn3->result() as $rw3){
+																		echo '<li class="list-group-item d-flex justify-content-between align-items-center">'.$rw3->nama_template;
+																		if ($rw3->jenis_template=='File')
+																			echo '<a href="'.base_url().'assets/uploads/templates/'.$rw3->file_template.'" target="blank"><span class="badge badge-info badge-pill ml-2"><i class="ti-zoom-in text"></i> UNDUH</span></a></li>';
+																			else
+																			echo '<a href="'.$rw3->file_template.'" target="blank"><span class="badge badge-info badge-pill ml-2"><i class="ti-zoom-in text"></i> UNDUH</span></a></li>';
+																				
+																		
+																	}
+															echo '</ul></td>';
 															echo '<td><ul class="list-group list-group-full">';
 																	$sql="SELECT a.*,(SELECT MAX(file_name) FROM dokumen WHERE pemohon_hid='".$rw->hid."' AND dokumen_hid=a.hid) filename FROM kamus_dupak a WHERE kegiatan_hid='".$rw2->kegiatan_id."'";
 																	$cn3 = $this->db->query($sql);

@@ -94,3 +94,5 @@ define("URL_FOTO_SIMSDM","http://localhost:70/simbkkbn/assets/uploads/pictures/"
 //define("URL_FOTO_SIMSDM","https://simsdmmob.bkkbn.go.id/assets/uploads/pictures/");
 define("TOKEN_SIMSDM","c5267b114e81119ca108d2ff64e64309");
 define("TOKEN_DOP","2b9b1842d1f572f0bfc270bfa1cc3041");
+define("NUM_PENILAI",2);
+

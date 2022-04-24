@@ -54,7 +54,7 @@
 		<div class="col-md-12"><h4><?php echo $rw->butir_kegiatan; ?></h4></div>
 		<div class="col-md-12">
 			<div class="form-group">
-				<iframe src="<?php echo base_url().'assets/uploads/dokumen/'.$rw->createdby.'/'.$rw->periode_hid.'/'.$rw->file_name; ?>" style="width:100%;border:0px;min-height: 450px"></iframe>
+				<iframe src="<?php if ($rw->dokumen_name=='File') echo base_url().'assets/uploads/dokumen/'.$rw->createdby.'/'.$rw->periode_hid.'/'.$rw->file_name; else echo $rw->file_name; ?>" style="width:100%;border:0px;min-height: 450px"></iframe>
 				
 			</div>
 		</div>
@@ -146,10 +146,27 @@ $rw=$query->row();
 				<b><?php echo $rw->output; ?></b>
 			</div>
 		</div>
-		<div class="col-md-12">
+		<div class="col-md-4">
+			<div class="form-group group">
+				<label>Jenis Template</label>
+				<?php
+                        
+                        $list=array('File','Link');
+                        $list2=array('1','2');
+                        echo $this->ReferensiModel->LoadList($list,$list,'dokname','','class="form-control" required','');
+                ?>
+			</div>
+		</div>
+		<div class="col-md-8" id="divlink">
+			<div class="form-group group">
+				<label>Link Dokumen</label>
+				<input type="text" name="linkdok" id="linkdok" class="form-control" value=""> 
+			</div>
+		</div>
+		<div class="col-md-12" id="divfile">
 			<div class="form-group group">
 				<label>Dokumen (PDF/Image)</label>
-				<input type="file" name="inputFile" class="dropify" ata-max-file-size="10M" data-allowed-file-extensions="pdf png jpg" required/>
+				<input type="file" name="inputFile" id="inputFile" class="dropify" data-max-file-size="10M" data-allowed-file-extensions="pdf png jpg" required/>
 			</div>
 		</div>
 	</div>
@@ -161,6 +178,19 @@ $rw=$query->row();
 </form>
 <script>
 	$('.dropify').dropify();
+	$("#dokname").change(function(){
+		if ($(this).val()=='Link'){
+			$('#divlink').show();
+			$('#divfile').hide();
+			$("#linkdok").prop('required',true);
+			$("#inputFile").prop('required',false);
+		} else {
+			$('#divfile').show();
+			$('#divlink').hide();
+			$("#inputFile").prop('required',true);
+			$("#linkdok").prop('required',false);
+		}
+	});
 	$('#formmodal').validate({
         rules: {
         },

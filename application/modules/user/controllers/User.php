@@ -360,7 +360,7 @@ class User extends MX_Controller
 					$insertid=$this->db->insert_id();
 					$this->ReferensiModel->insert_logs($this->session->userdata('userName'),'create','upload dokumen',$insertid,'dokumen');
 				}else{					
-					$sql="UPDATE dokumen SET file_name='$file_name',updateddate=NOW(),updatedby='$nip' WHERE pemohon_hid='".$this->input->post('phid')."' AND dupak_hid='".$this->input->post('hid')."' AND dokumen_hid='".$this->input->post('dokid')."'";
+					$sql="UPDATE dokumen SET dokumen_name='".$this->input->post('dokname')."',file_name='$file_name',updateddate=NOW(),updatedby='$nip' WHERE pemohon_hid='".$this->input->post('phid')."' AND dupak_hid='".$this->input->post('hid')."' AND dokumen_hid='".$this->input->post('dokid')."'";
 					$save=$this->db->query($sql);
 					$this->ReferensiModel->insert_logs($this->session->userdata('userName'),'create','upload dokumen',$hid,'dokumen');
 				}
@@ -368,6 +368,34 @@ class User extends MX_Controller
 			} else {
 				$this->session->set_flashdata('response','<div class="alert alert-danger m-t-40">Dokumen gagal diupload. </div>'); 
 			}
+		} else {
+			// upload link
+			$nip=$this->session->userdata('userName');
+			
+			$periodehid=$this->ReferensiModel->LoadSQL("SELECT periode_hid judul FROM pemohon a WHERE hid='".$this->input->post('phid')."'");
+			
+			$hid=$this->ReferensiModel->LoadSQL("SELECT hid judul FROM dokumen WHERE pemohon_hid='".$this->input->post('phid')."' AND dupak_hid='".$this->input->post('hid')."' AND dokumen_hid='".$this->input->post('dokid')."' AND jenis='pak'");
+				if ($hid=='') {
+					//$sql="INSERT INTO dokumen (pemohon_hid,dupak_hid,dokumen_hid,dokumen_name,file_name,creationdate,createdby,jenis) VALUES('".$this->input->post('phid')."','".$this->input->post('hid')."','".$this->input->post('dokid')."','".$this->input->post('dokname')."','$file_name',NOW(),'$nip','pak')";
+					$data=array(
+						'pemohon_hid'=>$this->input->post('phid'),
+						'dupak_hid'=>$this->input->post('hid'),
+						'dokumen_hid'=>$this->input->post('dokid'),
+						'dokumen_name'=>$this->input->post('dokname'),
+						'file_name'=>$this->input->post('linkdok'),
+						'creationdate'=>date("Y-m-d H:i:s"),
+						'createdby'=>$nip,
+						'jenis'=>'pak'
+					);
+					$this->ProsesModel->insert_personal($data,'dokumen');
+					$insertid=$this->db->insert_id();
+					$this->ReferensiModel->insert_logs($this->session->userdata('userName'),'create','upload dokumen',$insertid,'dokumen');
+				}else{					
+					$sql="UPDATE dokumen SET dokumen_name='".$this->input->post('dokname')."',file_name='".$this->input->post('linkdok')."',updateddate=NOW(),updatedby='$nip' WHERE pemohon_hid='".$this->input->post('phid')."' AND dupak_hid='".$this->input->post('hid')."' AND dokumen_hid='".$this->input->post('dokid')."'";
+					$save=$this->db->query($sql);
+					$this->ReferensiModel->insert_logs($this->session->userdata('userName'),'create','upload dokumen',$hid,'dokumen');
+				}
+				$this->session->set_flashdata('response','<div class="alert alert-success m-t-40">Dokumen berhasil diupload. </div>'); 
 		}
 		redirect('user/detildupak?hid='.md5(TOKEN_DOP.$this->input->post('phid')).'&tab=kegiatan');
 	}

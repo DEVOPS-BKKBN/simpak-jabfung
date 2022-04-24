@@ -70,4 +70,6 @@
 	<script src="<?php echo base_url();?>assets/js/plugin/trumbowyg/dist/plugins/resizimg/jquery-resizable.min.js"></script>
 	<script src="<?php echo base_url();?>assets/js/plugin/trumbowyg/dist/plugins/resizimg/trumbowyg.resizimg.min.js"></script>
 	<link rel="stylesheet" type="text/css" href="<?php echo base_url();?>assets/js/plugin/trumbowyg/dist/ui/trumbowyg.min.css">
+	<script type="text/javascript" src="<?php echo base_url(); ?>assets/js/plugin/toastify/toastify.js"></script>
+	<link rel="stylesheet" type="text/css" href="<?php echo base_url(); ?>assets/js/plugin/toastify/toastify.min.css">
 </head>

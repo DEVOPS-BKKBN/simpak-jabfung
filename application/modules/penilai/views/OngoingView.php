@@ -44,9 +44,17 @@
 												
 												$sql="SELECT a.*,DATE_FORMAT(a.tmtjab,'%d-%m-%Y') tmtjab,b.foto,c.namalengkap penilai,p.namaperiode
 														FROM pemohon a JOIN users b ON a.nip=b.username
-														LEFT JOIN penilai c ON a.penilai_id=c.hid 
+														LEFT JOIN pemohon_penilai c ON a.penilai_id=c.hid 
+														JOIN penilai d ON c.penilai_id=d.hid
 														JOIN periode p ON p.hid=a.periode_hid
-														WHERE a.status='3' AND penilaiandate IS NULL AND c.nip='".$this->session->userdata('userName')."'";
+														WHERE a.status='3' AND penilaian_date IS NULL AND c.nip='".$this->session->userdata('userName')."'";
+												$sql="SELECT a.*,DATE_FORMAT(a.tmtjab,'%d-%m-%Y') tmtjab,b.foto,d.namalengkap penilai,p.namaperiode 
+														FROM pemohon a 
+														JOIN users b ON a.nip=b.username 
+														JOIN pemohon_penilai c ON a.hid=c.pemohon_id 
+														JOIN periode p ON p.hid=a.periode_hid
+														JOIN penilai d ON c.penilai_id=d.hid
+														WHERE a.status >=3 AND penilaian_date IS NULL AND d.nip='".$this->session->userdata('userName')."'";
 												//echo $sql;
 												$pangkat = $this->db->query($sql);
 												foreach ($pangkat->result() as $rw){

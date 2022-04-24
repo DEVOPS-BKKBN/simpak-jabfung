@@ -44,7 +44,11 @@
 															</label>
 														</div>
 														</th>
-														<th>PENILAI</th>
+														<?php 
+														for ($i=1;$i<=NUM_PENILAI;$i++){
+															echo '<th>PENILAI '.$i.'</th>';
+														}
+														?>
 														<th>NOMOR</th>
 														<th>FOTO</th>
 														<th>NAMA</th>
@@ -53,7 +57,12 @@
 														<th>TMT GOL</th>
 														<th>JABATAN</th>
 														<th>UNIT KERJA</th>
-														<th>TOTAL PAK</th>
+														<?php
+														for ($i=1;$i<=NUM_PENILAI;$i++){
+															echo '<th>PAK PENILAI '.$i.'</th>';
+														}
+														?>
+														<th>PAK FINAL</th>
 														<th>STATUS</th>
 													</tr>
 												</thead>
@@ -72,9 +81,17 @@
 														
 														$n++;
 														echo '<tr>';
-														if ($rw2->status!=1) echo '<td><div class="form-check"><label class="form-check-label"><input class="form-check-input ckdel" type="checkbox" value="'.$rw2->hidpl.'"><span class="form-check-sign"></span></label></div></td>';	
-															else echo '<td></td>';
-														echo '<td>'.$rw2->penilai.'</td>';		
+														echo '<td>';
+														if ($rw2->status!=1) {
+															echo '<div class="form-check"><label class="form-check-label"><input class="form-check-input ckdel" type="checkbox" value="'.$rw2->hidpl.'"><span class="form-check-sign"></span></label></div>';	
+															echo '<a href="'.base_url().'penilaian/penilaianpleno?hid='.md5(TOKEN_DOP.$rw2->hid).'&phid='.$this->input->get('hid').'" class="mr-2" title="Penilaian Pleno"><i class="icon-note fa-2x"></i></a>';
+													
+														}
+														echo '</td>';
+														for ($i=1;$i<=NUM_PENILAI;$i++){
+															$penilai=$this->ReferensiModel->LoadSQL("SELECT namalengkap judul FROM pemohon_penilai a JOIN penilai b ON a.penilai_id=b.hid WHERE a.pemohon_id='".$rw2->hid."' AND a.penilai_ke='$i'");
+															echo '<td>'.$penilai.'</td>';
+														}		
 														echo '<td>'.$this->ReferensiModel->NomorDUPAK($rw2->hid).'</td>';
 														echo '<td><img src="'.URL_FOTO_SIMSDM.$rw2->foto.'"  class="img-circle" width="60"></td>';
 														echo '<td>'.$rw2->namalengkap.'</td>';
@@ -83,6 +100,11 @@
 														echo '<td>'.date("d-m-Y",strtotime($rw2->tmtgol)).'</td>';
 														echo '<td>'.$rw2->jabatan.'</td>';
 														echo '<td>'.$rw2->unitkerja.'</td>';
+														for ($i=1;$i<=NUM_PENILAI;$i++){
+															$penilaiid=$this->ReferensiModel->LoadSQL("SELECT b.hid judul FROM pemohon_penilai a JOIN penilai b ON a.penilai_id=b.hid WHERE a.pemohon_id='".$rw2->hid."' AND a.penilai_ke='$i'");
+															$nilai=$this->ReferensiModel->LoadSQL("SELECT ROUND(SUM(total_nilai),3) judul FROM dupak a JOIN kamus_kegiatan b ON a.kegiatan_id=b.hid JOIN dupak_penilai c ON a.hid=c.dupak_id WHERE pemohon_id='".$rw2->hid."' AND penilai_id='$penilaiid'");
+															echo '<td>'.$nilai.'</td>';
+														}
 														echo '<td>'.$this->ProsesModel->NilaiTotalPAKFinal($rw2->hid).'</td>';
 														echo '<td>'.$rw2->statuspleno.'</td>';
 														echo '</tr>';
@@ -114,7 +136,11 @@
 															</label>
 														</div>
 														</th>
-														<th>PENILAI</th>
+														<?php 
+														for ($i=1;$i<=NUM_PENILAI;$i++){
+															echo '<th>PENILAI '.$i.'</th>';
+														}
+														?>
 														<th>NOMOR</th>
 														<th>FOTO</th>
 														<th>NAMA</th>
@@ -123,7 +149,11 @@
 														<th>TMT GOL</th>
 														<th>JABATAN</th>
 														<th>UNIT KERJA</th>
-														<th>TOTAL PAK</th>
+														<?php
+														for ($i=1;$i<=NUM_PENILAI;$i++){
+															echo '<th>PAK PENILAI '.$i.'</th>';
+														}
+														?>
 													</tr>
 												</thead>
 												<tbody>
@@ -140,8 +170,13 @@
 														
 														$n++;
 														echo '<tr>';
-														echo '<td><div class="form-check"><label class="form-check-label"><input class="form-check-input ckdel" type="checkbox" value="'.$rw2->hid.'"><span class="form-check-sign"></span></label></div></td>';	
-														echo '<td>'.$rw2->penilai.'</td>';		
+														echo '<td>';
+														if ($rw2->status=='4') echo '<div class="form-check"><label class="form-check-label"><input class="form-check-input ckdel" type="checkbox" value="'.$rw2->hid.'"><span class="form-check-sign"></span></label></div>';
+														echo '</td>';	
+														for ($i=1;$i<=NUM_PENILAI;$i++){
+															$penilai=$this->ReferensiModel->LoadSQL("SELECT namalengkap judul FROM pemohon_penilai a JOIN penilai b ON a.penilai_id=b.hid WHERE a.pemohon_id='".$rw2->hid."' AND a.penilai_ke='$i'");
+															echo '<td>'.$penilai.'</td>';
+														}	
 														echo '<td>'.$this->ReferensiModel->NomorDUPAK($rw2->hid).'</td>';
 														echo '<td><img src="'.URL_FOTO_SIMSDM.$rw2->foto.'"  class="img-circle" width="60"></td>';
 														echo '<td>'.$rw2->namalengkap.'</td>';
@@ -150,7 +185,12 @@
 														echo '<td>'.date("d-m-Y",strtotime($rw2->tmtgol)).'</td>';
 														echo '<td>'.$rw2->jabatan.'</td>';
 														echo '<td>'.$rw2->unitkerja.'</td>';
-														echo '<td>'.$this->ProsesModel->NilaiTotalPAKFinal($rw2->hid).'</td>';
+														for ($i=1;$i<=NUM_PENILAI;$i++){
+															$penilaiid=$this->ReferensiModel->LoadSQL("SELECT b.hid judul FROM pemohon_penilai a JOIN penilai b ON a.penilai_id=b.hid WHERE a.pemohon_id='".$rw2->hid."' AND a.penilai_ke='$i'");
+															$nilai=$this->ReferensiModel->LoadSQL("SELECT ROUND(SUM(total_nilai),3) judul FROM dupak a JOIN kamus_kegiatan b ON a.kegiatan_id=b.hid JOIN dupak_penilai c ON a.hid=c.dupak_id WHERE pemohon_id='".$rw2->hid."' AND penilai_id='$penilaiid'");
+															echo '<td>'.$nilai.'</td>';
+														}
+														//echo '<td>'.$this->ProsesModel->NilaiTotalPAKFinal($rw2->hid).'</td>';
 														echo '</tr>';
 
 													}

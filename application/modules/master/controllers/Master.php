@@ -14,6 +14,47 @@ class Master extends MX_Controller
         }
         
     }
+	public function add_template (){
+		
+		$thid=$this->input->post('thid');
+		
+		$data=array(
+			'kegiatan_id'=>$this->input->post('hid'),
+			'jenis_template'=>$this->input->post('jenis'),
+			'nama_template'=>$this->input->post('nama'),
+		);
+		if ($this->input->post('jenis')=='Link') $data=array_merge($data,array('file_template'=>$this->input->post('namafile')));
+		//var_dump($_POST);exit();
+		
+		// upload file
+		if (!file_exists('assets/uploads/templates')) {
+				mkdir('assets/uploads/templates', 0777, true);
+			}
+		
+		
+			$target_dir = 'assets/uploads/templates/';
+			$ext = pathinfo($_FILES["inputFile"]["name"], PATHINFO_EXTENSION);
+			$file_name=str_replace(" ","",$_FILES["inputFile"]["name"]);
+			$target_file = $target_dir.$file_name;
+		
+			if (move_uploaded_file($_FILES["inputFile"]["tmp_name"], $target_file)) {
+				$data=array_merge($data,array('file_template'=>$file_name));
+			}
+		//var_dump($data);
+		//exit();
+		if ($thid==''){
+            $data=array_merge($data,array('creation_date'=>date("Y-m-d H:i:s"),'created_by'=>$this->session->userdata('userName')));
+			$this->ProsesModel->insert_personal($data,'kamus_templates');
+			$this->session->set_flashdata('response', $this->ReferensiModel->showMessage('Data telah berhasil ditambahkan.', 'success'));
+		}else{
+			$this->ProsesModel->update_personal($data,$thid,'kamus_templates','hid');
+			$this->session->set_flashdata('response', $this->ReferensiModel->showMessage('Sukses mengupdate data.', 'success'));
+		}
+		
+
+		redirect('master/kamus?jabatan='.$this->input->post('jabatan').'&kelompok='.$this->input->post('kelompok').'&jenisjab='.$this->input->post('jenisjab'), 'refresh');
+    
+	}
     public function hapusUser(){
 		
 		$data=$this->input->post('hid');
@@ -86,15 +127,21 @@ class Master extends MX_Controller
 		redirect('master/users', 'refresh');
     }
 	public function add_dokumen(){
+		$thid=$this->input->post('thid');
+		
 		$data=array(
 			'kegiatan_hid'=>$this->input->post('hid'),
 			'output'=>$this->input->post('nama'),
 			'creation_date'=>date("Y-m-d H:i:s"),
 			'created_by'=>$this->session->userdata('userName')
 		);
-		
-		$this->ProsesModel->insert_personal($data,'kamus_dupak');
-		$this->session->set_flashdata('response', $this->ReferensiModel->showMessage('Data telah berhasil ditambahkan.', 'success'));
+		if ($thid==''){
+			$this->ProsesModel->insert_personal($data,'kamus_dupak');
+			$this->session->set_flashdata('response', $this->ReferensiModel->showMessage('Data telah berhasil ditambahkan.', 'success'));
+		}else{
+			$this->ProsesModel->update_personal($data,$thid,'kamus_dupak','hid');
+			$this->session->set_flashdata('response', $this->ReferensiModel->showMessage('Sukses mengupdate data.', 'success'));
+		}
 		redirect('master/kamus?jabatan='.$this->input->post('jabatan').'&jenisjab='.$this->input->post('jenisjab'), 'refresh');
 	}
 	public function hapusDokumen(){

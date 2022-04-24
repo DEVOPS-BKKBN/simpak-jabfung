@@ -18,6 +18,7 @@
 
                                 <div class="card-body">
 									<form action="<?php echo base_url(); ?>penilaian/bap" method="GET">
+									<input type="hidden" name="tab" value="<?php echo $this->input->get('tab'); ?>"/>
 									<div class="row">                        
 										<div class="col-md-5">
 											<div class="form-group">
@@ -128,10 +129,16 @@
 															<input type="text" name="tgl2" id="tgl2" class="form-control datepicker" value="" required> 
 														</div>
 													</div>	
-													<div class="col-md-6 group">
+													<div class="col-md-4 group">
 														<div class="form-group form-group-default">
 															<label>No BAP</label>
 															<input type="text" name="nomor" id="nomor" class="form-control" value="" required> 
+														</div>
+													</div>
+													<div class="col-md-6 group">
+														<div class="form-group form-group-default">
+															<label>Notes BAP</label>
+															<textarea name="ket" id="ket" class="form-control"></textarea>
 														</div>
 													</div>
 													
@@ -153,7 +160,6 @@
 															</label>
 														</div>
 														</th>
-														<th>PENILAI</th>
 														<th>NOMOR</th>
 														<th>FOTO</th>
 														<th>NAMA</th>
@@ -182,7 +188,7 @@
 														$n++;
 														echo '<tr>';
 														echo '<td><div class="form-check"><label class="form-check-label"><input class="form-check-input ckdel" type="checkbox" value="'.$rw2->hid.'"><span class="form-check-sign"></span></label></div></td>';	
-														echo '<td>'.$rw2->penilai.'</td>';		
+														//echo '<td>'.$rw2->penilai.'</td>';		
 														echo '<td>'.$this->ReferensiModel->NomorDUPAK($rw2->hid).'</td>';
 														echo '<td><img src="'.URL_FOTO_SIMSDM.$rw2->foto.'"  class="img-circle" width="60"></td>';
 														echo '<td>'.$rw2->namalengkap.'</td>';
@@ -299,7 +305,7 @@
 					$('#preloader-active').show();
 					$.ajax({
 						url: "<?php echo base_url(); ?>penilaian/simpanbap",
-						data: "ids=" + ids+"&tgl1="+$('#tgl1').val()+"&tgl2="+$('#tgl2').val()+"&nomor="+$('#nomor').val(),
+						data: "ids=" + ids+"&tgl1="+$('#tgl1').val()+"&tgl2="+$('#tgl2').val()+"&nomor="+$('#nomor').val()+"&ket="+$('#ket').val(),
 						cache: false,
 						method: 'post',
 						success: function(data) {

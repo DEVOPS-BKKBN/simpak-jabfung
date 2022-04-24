@@ -105,8 +105,12 @@ $rw = $query->row();
     });
 </script>
 <?php } ?>
-<?php if ($action=='dokumen'){?>
+<?php if ($action=='dokumen'){
+$query = $this->db->get_where('kamus_dupak', array('hid' => $this->input->get('thid')));
+$rw = $query->row();
+?>
 <form method="post" class="form-material" name="formmst" id="formmst" action="<?php echo base_url(); ?>master/add_dokumen">
+<input type="hidden" name="thid" value="<?php echo $this->input->get('thid'); ?>"/>
 <input type="hidden" name="hid" value="<?php echo $hid; ?>"/>
 <input type="hidden" name="jabatan" value="<?php echo $this->input->get('jabatan'); ?>"/>
 <input type="hidden" name="jenisjab" value="<?php echo $this->input->get('jenisjab'); ?>"/>
@@ -119,7 +123,7 @@ $rw = $query->row();
 		<div class="col-md-12">
 			<div class="form-group">
 				<label>Nama Dokumen</label>
-				<input type="text" name="nama" class="form-control" value="<?php if (!empty($rw)) echo $rw['Judul']; ?>" required> 
+				<input type="text" name="nama" class="form-control" value="<?php if (!empty($rw)) echo $rw->output; ?>" required> 
 			</div>
 		</div>
 	</div>
@@ -129,6 +133,76 @@ $rw = $query->row();
 	<button type="submit" class="btn btn-primary waves-effect text-left">Simpan</button>
 </div>
 </form>
+<?php } ?>
+<?php if ($action=='template'){
+	$query = $this->db->get_where('kamus_templates', array('hid' => $this->input->get('thid')));
+	$rw = $query->row();
+?>
+<form method="post" class="form-material" name="formmst" id="formmst" action="<?php echo base_url(); ?>master/add_template" enctype="multipart/form-data">
+<input type="hidden" name="hid" value="<?php echo $hid; ?>"/>
+<input type="hidden" name="thid" value="<?php echo $this->input->get('thid'); ?>"/>
+<input type="hidden" name="jabatan" value="<?php echo $this->input->get('jabatan'); ?>"/>
+<input type="hidden" name="jenisjab" value="<?php echo $this->input->get('jenisjab'); ?>"/>
+<div class="modal-header">
+	<h4 class="modal-title" id="myLargeModalLabel">Master Dokumen Template</h4>
+	<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+</div>
+<div class="modal-body">
+	<div class="row">
+		<div class="col-md-8">
+			<div class="form-group">
+				<label>Nama Template</label>
+				<input type="text" name="nama" class="form-control" value="<?php if (!empty($rw)) echo $rw->nama_template; ?>" required> 
+			</div>
+			
+		</div>
+		<div class="col-md-4">
+			<div class="form-group">
+				<label>Jenis Template</label>
+				<?php
+                        if (!empty($rw)) $status=$rw->jenis_template; else $status="";
+                        $list=array('File','Link');
+                        $list2=array('1','2');
+                        echo $this->ReferensiModel->LoadList($list,$list,'jenis',$status,'class="form-control" required','');
+                ?>
+			</div>
+		</div>
+		<div class="col-md-12" id="divlink" <?php if (!empty($rw)){ if ($rw->jenis_template!='Link') echo 'style="display:none"';} ?>>
+			<div class="form-group">
+				<label>Link Template</label>
+				<input type="text" name="namafile" id="namafile" class="form-control" value="<?php if (!empty($rw)) echo $rw->file_template; ?>"> 
+			</div>
+		</div>
+		<div class="col-md-12" id="divfile" <?php if (!empty($rw)){ if ($rw->jenis_template!='File') echo 'style="display:none"';} ?>>
+			<div class="form-group">
+				<label>File Template</label>
+				<input type="file" name="inputFile" id="inputFile" class="dropify" ata-max-file-size="10M" data-allowed-file-extensions="xls docx"/>
+				<?php if (!empty($rw)){ if ($rw->jenis_template=='File') echo '<a href="'.base_url().'assets/uploads/templates/'.$rw->file_template.'" target="_blank">'.$rw->file_template.'</a>';} ?>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="modal-footer">
+	<button type="button" class="btn btn-danger waves-effect text-left" data-dismiss="modal">Tutup</button>
+	<button type="submit" class="btn btn-primary waves-effect text-left">Simpan</button>
+</div>
+</form>
+<script>
+	$('.dropify').dropify();
+	$("#jenis").change(function(){
+		if ($(this).val()=='Link'){
+			$('#divlink').show();
+			$('#divfile').hide();
+			$("#namafile").prop('required',true);
+			$("#inputFile").prop('required',false);
+		} else {
+			$('#divfile').show();
+			$('#divlink').hide();
+			$("#inputFile").prop('required',true);
+			$("#namafile").prop('required',false);
+		}
+	});
+</script>
 <?php } ?>
 <?php if ($action == 'kamus') {
 

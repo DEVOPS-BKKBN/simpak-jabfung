@@ -79,6 +79,7 @@
 													<th scope="col">Jenis</th>
 													<th scope="col">Output</th>
 													<th scope="col">Angka Kredit</th>
+													<th scope="col">Dokumen Templates</th>
 													<th scope="col">Dokumen Fisik</th>
 													<th scope="col">Aksi</th>
                                                 </tr>
@@ -107,11 +108,19 @@
 													echo '<td>'.$rw->output.'</td>';
 													echo '<td>'.$rw->jumlah_ak.'</td>';
 													echo '<td><ul>';
+													echo '<button type="button" class="btn btn-icon btn-sm btn-round btn-primary template" data-id="'.$rw->hid.'"><i class="fa fa-plus"></i></button>';
+													$sql="SELECT * FROM kamus_templates WHERE kegiatan_id='".$rw->hid."' AND deleted_at IS NULL";
+													$cn2 = $this->db->query($sql);
+													foreach ($cn2->result() as $rw2){
+														echo '<li>'.$rw2->nama_template.' <a href="'.base_url().'master/modal?action=template&thid='.$rw2->hid.'&jenisjab='. $this->input->get('jenisjab').'&jabatan='. $this->input->get('jabatan').'&hid='.$rw->hid.'" class="ls-modal" data-id="'.md5($rw2->hid).'"><i class="fa fa-pen"></i></a> <a href="" class="deltemplate" data-id="'.md5($rw2->hid).'"><i class="fa fa-trash" style="color:red"></i></a></li>';
+													}
+													echo '</ul></td>';
+													echo '<td><ul>';
 													echo '<button type="button" class="btn btn-icon btn-sm btn-round btn-primary dokumen" data-id="'.$rw->hid.'"><i class="fa fa-plus"></i></button>';
 													$sql="SELECT * FROM kamus_dupak WHERE kegiatan_hid='".$rw->hid."' AND deleted_at IS NULL";
 													$cn2 = $this->db->query($sql);
 													foreach ($cn2->result() as $rw2){
-														echo '<li>'.$rw2->output.' <a href="" class="deldok" data-id="'.md5($rw2->hid).'"><i class="fa fa-trash" style="color:red"></i></a></li>';
+														echo '<li>'.$rw2->output.' <a href="'.base_url().'master/modal?action=dokumen&thid='.$rw2->hid.'&jenisjab='. $this->input->get('jenisjab').'&jabatan='. $this->input->get('jabatan').'&hid='.$rw->hid.'" class="ls-modal" data-id="'.md5($rw2->hid).'"><i class="fa fa-pen"></i></a> <a href="" class="deldok" data-id="'.md5($rw2->hid).'"><i class="fa fa-trash" style="color:red"></i></a></li>';
 													}
 													
 													echo '</ul></td>';
@@ -278,6 +287,12 @@
                 } 
             });
         })
+		$("#datatable").on("click", ".template", function(e) {
+            var hid = $(this).data("id");
+			var hid = $(this).data("id");
+			console.log('id',hid);
+			$('#largeModal').modal('show').find('.modal-content').html('<div class="spinner-border text-info m-t-10 m-b-10 m-l-10" role="status"><span class="sr-only">Loading...</span></div>').load('<?php echo base_url(); ?>master/modal?action=template&jenisjab=<?php echo $this->input->get('jenisjab'); ?>&jabatan='+escape('<?php echo $this->input->get('jabatan'); ?>')+'&hid='+hid);
+        })
 		$("#datatable").on("click", ".dokumen", function(e) {
             var hid = $(this).data("id");
 			var hid = $(this).data("id");
@@ -295,6 +310,7 @@
 			"pageLength": 50
 
 		});
+		
 		$('#ckall').on('click', function() {
 			// Get all rows with search applied
 			var rows = table.rows({

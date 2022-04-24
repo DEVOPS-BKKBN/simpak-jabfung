@@ -45,7 +45,8 @@ class Penilaian extends MX_Controller
 				'updatedby'=>$this->session->userdata('userName'),
 				'tgl_bap'=>$this->ReferensiModel->DMYtoYMD($this->input->post('tgl1')),
 				'tgl_surat'=>$this->ReferensiModel->DMYtoYMD($this->input->post('tgl2')),
-				'no_bap'=>$this->input->post('nomor')
+				'no_bap'=>$this->input->post('nomor'),
+				'bap_note'=>$this->input->post('ket')
 			);
 			$this->ProsesModel->update_personal($data,$ids[$i],'pemohon','hid');
 			
@@ -71,8 +72,72 @@ class Penilaian extends MX_Controller
 		
 		$this->session->set_flashdata('response','<div class="alert alert-success m-t-40">Data berhasil disimpan. </div>'); 
 	}
+	public function updatePenilaiNon(){
+		
+		//var_dump($_POST);
+		// add users
+		$datau=array(
+			'Username'=>$this->input->post('nik'),
+			'EmployeeId'=>$this->input->post('nik'),
+			'Password'=>md5($this->input->post('upwd')),
+			'DisplayName'=>$this->input->post('nama'),
+			'Jabatan'=>$this->input->post('jbt'),
+			'PangkatGol'=>$this->input->post('golongan'),
+			'RolesId'=>'3',
+			'CreationDate'=>date("Y-m-d H:i:s"),
+			'CreatedBy'=>$this->session->userdata('userName')
+		);
+		$this->ProsesModel->insert_personal($datau,'users');
+			
+		
+		// add penilai
+		$datap=array(
+			'nip'=>$this->input->post('nik'),
+			'namalengkap'=>$this->input->post('nama'),
+			'jabatan'=>$this->input->post('jbt'),
+			'golonganpangkat'=>$this->input->post('golongan'),
+			'unitkerja'=>$this->input->post('unitkerja'),
+			'creationdate'=>date("Y-m-d H:i:s"),
+			'createdby'=>$this->session->userdata('userName'),
+			'sebagai'=>$this->input->post('sebagai'),
+            'jenjang'=>$this->input->post('jenjang'),
+		);
+		$this->ProsesModel->insert_personal($datap,'penilai');
+		
+		$this->session->set_flashdata('response','<div class="alert alert-success m-t-40">Data berhasil ditambahkan. </div>');
+		redirect('penilaian/penilai', 'refresh');
+	}
 	public function add_penilai(){
-		$sql="UPDATE pemohon SET penilai_id='".$this->input->post('penilai')."',status='3',updateddate=NOW(),updatedby='".$this->session->userdata('userName')."' WHERE hid IN(".$this->input->post('ids').")";
+		
+		//var_dump($_POST);
+		$ids=explode(",",$this->input->post('ids'));
+		for ($j=0;$j<count($ids);$j++){
+			for ($i=1;$i<=NUM_PENILAI;$i++){
+				// set penilai 1
+				if ($i==1){
+					$sql="UPDATE pemohon SET penilai_id='".$this->input->post('penilai1')."',status='3',updateddate=NOW(),updatedby='".$this->session->userdata('userName')."' WHERE hid='".$ids[$j]."'";
+					$save=$this->db->query($sql);
+				}
+				// cek if exists
+				if ($this->input->post('penilai'.$i)!=""){
+					$hid=$this->ReferensiModel->LoadSQL("SELECT hid judul FROM pemohon_penilai WHERE pemohon_id='".$ids[$j]."' AND penilai_ke='$i'");
+					$data=array(
+						'pemohon_id'=>$ids[$j],
+						'penilai_id'=>$this->input->post('penilai'.$i),
+						'penilai_ke'=>$i,
+						'creation_date'=>date("Y-m-d H:i:s"),
+						'created_by'=>$this->session->userdata('userName')
+					);
+					//var_dump($data);
+					if ($hid=="") $this->ProsesModel->insert_personal($data,'pemohon_penilai');
+						else $this->ProsesModel->update_personal($data,$hid,'pemohon_penilai','hid');
+				}
+				
+			}
+		}
+		$this->session->set_flashdata('response','<div class="alert alert-success m-t-40">Penilai berhasil disimpan. </div>'); 
+		/*
+		$sql="UPDATE pemohon SET penilai_id='".$this->input->post('penilai1')."',status='3',updateddate=NOW(),updatedby='".$this->session->userdata('userName')."' WHERE hid IN(".$this->input->post('ids').")";
 		//echo $sql;
 		$save=$this->db->query($sql);
 		
@@ -83,6 +148,7 @@ class Penilaian extends MX_Controller
 		}
 		
 		$this->session->set_flashdata('response','<div class="alert alert-success m-t-40">Penilai berhasil disimpan. </div>'); 
+		*/
 	}
 	function updatePleno(){
         $tgl1=$this->input->post('tgl1');
@@ -401,6 +467,41 @@ class Penilaian extends MX_Controller
         $this->load->view('DetilPlenoView',$data);
        
     }
+	function nilaipleno(){
+		//var_dump($_POST);
+		$data=array(
+			'total_ak_penilai'=>$this->input->post('value'),
+			'penilaiandate'=>date("Y-m-d H:i:s"),
+			'penilaianby'=>$this->session->userdata('userName')
+		);
+		$this->ProsesModel->update_personal($data,$this->input->post('hid'),'dupak','hid');
+		
+	}
+	function penilaianpleno(){
+		$data['judulpage']='Penilaian Pleno';
+        $data['action']='nilaipleno';
+		
+		$hid=$this->input->get('hid');
+		$tab=$this->input->get('tab');
+		$data['hid']=$hid;
+		$data['tab']=$tab;
+		
+		$sql="(SELECT a.*,u.foto fotopegawai,
+		CONCAT(DATE_FORMAT(startdate,'%d %b %Y'),' s.d ',DATE_FORMAT(enddate,'%d %b %Y')) periode
+		FROM pemohon a JOIN periode b ON a.periode_hid=b.hid JOIN users u ON u.Username=a.nip) dupak";
+		$query=$this->db->get_where($sql,array("md5(CONCAT('".TOKEN_DOP."',hid))"=>$this->input->get('hid')));
+		$rw=$query->row();
+		$data['rw']=$rw;
+		
+		$data['nomor']=$this->ReferensiModel->NomorDupak($rw->hid);
+		$data['tab']=$this->input->get('tab');
+		$data['hid']=$this->input->get('hid');
+		$data['phid']=$rw->hid;
+		$data['status']='';
+		
+		$this->load->view('PenilaianPlenoView',$data);
+		
+	}
     function periode() {
         $data['judulpage']='Periode PAK';
         $data['action']='periode';

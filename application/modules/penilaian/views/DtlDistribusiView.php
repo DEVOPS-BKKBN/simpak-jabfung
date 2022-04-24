@@ -26,20 +26,27 @@
 								
                                 <div class="card-body">
 									<?php if ($this->input->get('jenis')=='belum' || $this->input->get('jenis')=='ada') { ?>
+									<form id="form1">
 									<div class="row">
-										<div class="col-12">
+										<?php
+											// looping sesuai contansts
+											for ($i=1;$i<=NUM_PENILAI;$i++){
+										?>
+										<div class="col-4">
 											<div class="form-group">
-												<label>Pilih Penilai</label>
+												<label>Pilih Penilai <?php echo $i; ?></label>
 												<?php
 													$sql="SELECT hid kode,CONCAT(namalengkap,' - ',jabatan) nilai FROM penilai";
-													echo $this->ReferensiModel->LoadListMaster($sql,'penilai','','class="form-control custom-select" required','');
+													echo $this->ReferensiModel->LoadListMaster($sql,'penilai'.$i,'','class="form-control penilai" required','');
 												?>
 											</div>
 										</div>
+											<?php } ?>
 										<div class="col-md-12">
 											<button type="button" id="simpan" class="btn btn-sm btn-primary waves-effect text-left">Simpan Penilai</button>
 										</div>
 									</div>
+									</form>
 									<hr>
 									<?php } ?>
                                     <div class="table-responsive">
@@ -54,7 +61,12 @@
 														</label>
 													</div>
 													</th>
-													<th>PENILAI</th>
+													<?php 
+														for ($i=1;$i<=NUM_PENILAI;$i++){
+															echo '<th>PENILAI '.$i.'</th>';
+														}
+													?>
+													
 													<th>NOMOR</th>
 													<th>FOTO</th>
 													<th>NAMA</th>
@@ -88,7 +100,10 @@
 													$n++;
 													echo '<tr>';
 													echo '<td><div class="form-check"><label class="form-check-label"><input class="form-check-input ckdel" type="checkbox" value="'.$rw->hid.'"><span class="form-check-sign"></span></label></div></td>';	
-													echo '<td>'.$rw->penilai.'</td>';		
+													for ($i=1;$i<=NUM_PENILAI;$i++){
+														$penilai=$this->ReferensiModel->LoadSQL("SELECT namalengkap judul FROM pemohon_penilai a JOIN penilai b ON a.penilai_id=b.hid WHERE a.pemohon_id='".$rw->hid."' AND a.penilai_ke='$i'");
+														echo '<td>'.$penilai.'</td>';
+													}
 													echo '<td>'.$this->ReferensiModel->NomorDUPAK($rw->hid).'</td>';
 													echo '<td><img src="'.URL_FOTO_SIMSDM.$rw->foto.'"  class="img-circle" width="60"></td>';
 													echo '<td>'.$rw->namalengkap.'</td>';
@@ -119,7 +134,7 @@
         </div>
     </div>
     <script>
-        $('#penilai').select2();
+        $('.penilai').select2();
 		$("#xls").click(function() {
 		//console.log('download');
 			window.open("<?php echo base_url();?>penilaian/xlsdistribusi?phid=<?php echo $this->input->get('phid'); ?>&status=<?php echo $this->input->get('status'); ?>&jenis=<?php echo $this->input->get('jenis'); ?>"); 
@@ -188,11 +203,11 @@
 				})
 				return false;
 			}
-			if ($('#penilai').val()==''){
+			if ($('#penilai1').val()==''){
 				swal({
 					type: 'error',
 					title: 'Error!',
-					text: 'Penilai kosong !',
+					text: 'Penilai 1 kosong !',
 					confirmButtonText: 'Tutup',
 					buttonsStyling: false,
 					confirmButtonClass: 'btn btn-lg btn-danger'
@@ -203,21 +218,23 @@
 				title: 'Yakin simpan penilai ?',
 				text: "",
 				type: 'warning',
-				showCancelButton: true,
-				confirmButtonColor: '#3085d6',
-				cancelButtonColor: '#FF586B',
-				confirmButtonText: 'Ya',
-				cancelButtonText: 'Batal',
-				confirmButtonClass: 'btn btn-success mr-5',
-				cancelButtonClass: 'btn btn-danger',
-				buttonsStyling: true,
-				reverseButtons: true,
+				buttons: {
+                    cancel: {
+                        visible: true,
+                        text: 'Batal',
+                        className: 'btn btn-danger'
+                    },
+                    confirm: {
+                        text: 'Ya',
+                        className: 'btn btn-success'
+                    }
+                }
 			}).then((result) => {
 				if (result) {
 					$('#preloader-active').show();
 					$.ajax({
 						url: "<?php echo base_url(); ?>penilaian/add_penilai",
-						data: "ids=" + ids+"&penilai="+$('#penilai').val(),
+						data: "ids=" + ids+"&"+$("#form1").serialize(),
 						cache: false,
 						method: 'post',
 						success: function(data) {
