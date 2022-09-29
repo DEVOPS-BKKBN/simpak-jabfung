@@ -110,7 +110,9 @@
                                         <div class="user-profile text-center">
                                             <div class="name"><?php if (!empty($rw)) echo $rw->DisplayName; ?></div>
                                             <div class="job"><?php if (!empty($rw)) echo $rw->Username; ?></div>
-                                            <div class="desc"><?php if (!empty($rw)) echo $rw->Jabatan; ?></div>
+                                            <div class="desc"><?php if (!empty($rw)) echo $rw->Jabatan.', '.$this->ReferensiModel->YMDtoDMY($rw->TmtJab); ?></div>
+											<div class="desc"><?php if (!empty($rw)) echo $rw->PangkatGol.', '.$this->ReferensiModel->YMDtoDMY($rw->TmtGol).', '.$rw->Karpeg; ?></div>
+											<div class="desc"><?php if (!empty($rw)) echo $rw->BiroName; ?></div>
                                         </div>
                                     </div>
                                 </div>
@@ -126,7 +128,7 @@
 		<script>
 			$("#atasan").select2({
 				ajax: {
-					url: "<?php echo base_url(); ?>master/caripegawai",
+					url: "<?php echo base_url(); ?>user/caripegawai",
 					dataType: 'json',
 					delay: 250,
 					data: function(params) {

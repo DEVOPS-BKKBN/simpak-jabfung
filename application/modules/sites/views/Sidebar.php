@@ -79,7 +79,14 @@
 								<p>DUPAK</p>
 							</a>
 							
-						</li>
+					</li>
+					<li class="nav-item <?php if ($urlmenu=='harian') echo 'active'; ?>">
+							<a href="<?php echo base_url(); ?>user/harian">
+								<i class="fas fa-calendar-plus"></i>
+								<p>Kegiatan Harian</p>
+							</a>
+							
+					</li>
 					<?php } ?>
 					<?php if ($this->session->userdata('leveluser')=='3'){ 
 						// baca num dupak penilaian belum di proses

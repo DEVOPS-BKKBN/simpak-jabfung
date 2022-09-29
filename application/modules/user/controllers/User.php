@@ -14,6 +14,42 @@ class User extends MX_Controller
         }
         
     }
+	public function caripegawai(){
+		
+		$urlapi=URL_SIMSDM."index.php/ProsesController/searchPenilai";
+		$data = array("token" => TOKEN_SIMSDM,"cari"=>$this->input->get('q'));
+		$post = json_encode($data);
+
+			
+			
+		$ch = curl_init();
+		curl_setopt($ch, CURLOPT_URL,$urlapi);
+		curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+		curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+		'Content-Type: application/json',
+		'Content-Length: ' . strlen($post))
+		);
+
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER,1);
+		$result=curl_exec ($ch);
+
+		curl_close ($ch);
+		$json = json_decode($result, true);
+		
+		
+		$answer=array();
+		
+		if (!empty($json)){
+			foreach($json as $item) { //foreach element in $arr
+				$answer[] = array("id"=>$item['NIP'].'|'.$item['PNS_NIPLAMA'].'|'.$item['foto'], "text"=>$item['nama'].' '.$item['NIP'].' '.$item['Biro']);
+			}
+		}
+		echo json_encode($answer);
+	}
 	function updatePwd(){
        // var_dump($_POST);
         $pwdhash=md5($this->input->post('cpwdbaru'));
@@ -433,6 +469,33 @@ class User extends MX_Controller
 		}
 		redirect('user/detildupak?hid='.md5(TOKEN_DOP.$this->input->post('phid')).'&tab=');
 	}
+	function updateHarian(){
+		$hid=$this->input->post('hid');
+		
+		$data=array(
+			'kegiatan_id'=>$this->input->post('butir'),
+			'nama_kegiatan'=>$this->input->post('nama'),
+			'tgl_kegiatan'=>$this->ReferensiModel->DMYtoYMD($this->input->post('tgl')),
+		);
+		if ($hid==''){
+			$data=array_merge($data,array('creation_date'=>date("Y-m-d H:i:s"),'created_by'=>$this->session->userdata('userName')));
+			$this->ProsesModel->insert_personal($data,'harian');
+			$this->session->set_flashdata('response', $this->ReferensiModel->showMessage('Data telah berhasil ditambahkan.', 'success'));
+		}else{
+			$data=array_merge($data,array('updated_date'=>date("Y-m-d H:i:s"),'updated_by'=>$this->session->userdata('userName')));
+			$this->ProsesModel->update_personal($data,$hid,'harian','hid');
+			$this->session->set_flashdata('response', $this->ReferensiModel->showMessage('Sukses mengupdate data.', 'success'));
+		}
+		redirect('user/harian', 'refresh');
+	}
+	public function hapusHarian(){
+		
+		$data=$this->input->post('hid');
+		$this->db->where_in('md5(hid)', $data);
+        $this->db->delete('harian');
+		$this->session->set_flashdata('response','<div class="alert alert-success m-t-40">Data berhasil dihapus. </div>');
+		
+	}
 	function chgpwd(){
 		$data['judulpage']='Change Password User';
         $data['action']='chgpwd';
@@ -446,6 +509,13 @@ class User extends MX_Controller
 		
 		
         $this->load->view('DUPAKView',$data);
+	}
+	function harian(){
+		$data['judulpage']='Kegiatan Harian';
+        $data['action']='harian';
+		
+		
+        $this->load->view('HarianView',$data);
 	}
 	function detildupak(){
 		$data['judulpage']='Detil PAK';

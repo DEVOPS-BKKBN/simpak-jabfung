@@ -355,3 +355,76 @@ $rw=$query->row();
     });
 </script>
 <?php } ?>
+<?php if ($action == 'harian') {
+
+$query = $this->db->get_where('harian', array('hid' => $hid));
+$rw = $query->row();
+
+?>
+<form action="<?php echo base_url(); ?>user/updateHarian" method="post" name="formmodal" id="formmodal" enctype="multipart/form-data">
+    <input type="hidden" name="hid" value="<?php echo $hid; ?>" />
+    <input type="hidden" name="action" value="<?php echo $action; ?>" />
+    <div class="modal-header">
+        <h4 class="modal-title">Kegiatan Harian</h4>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+    </div>
+
+    <div class="modal-body" style="max-height:500px;overflow-y:auto">
+        <div class="row">
+			<div class="col-md-12 group">
+                <div class="form-group">
+                    <label for="kategori">Butir Kegiatan</label>
+                    <?php
+                        if (!empty($rw)) $status=$rw->kegiatan_id; else $status="";
+                        $sql="SELECT DISTINCT  hid kode,CONCAT(butir_kegiatan,', AK: ',jumlah_ak) nilai FROM kamus_kegiatan WHERE deleted_at IS NULL ORDER BY butir_kegiatan";
+                        echo $this->ReferensiModel->LoadListMaster($sql,'butir',$status,'class="form-control" required','');
+                    ?>
+                </div>
+            </div>
+			
+            <div class="col-md-12 group">
+                <div class="form-group">
+                    <label for="nama">Nama Kegiatan</label>
+                    <textarea class="form-control" id="nama" name="nama" required><?php if (!empty($rw)) echo $rw->nama_kegiatan; ?></textarea>
+                    
+                </div>
+            </div>
+			 <div class="col-md-4 group">
+                <div class="form-group">
+                    <label>Tanggl Kegiatan</label>
+                    <input type="text" name="tgl" class="form-control datepicker" value="<?php if (!empty($rw)) echo $this->ReferensiModel->YMDtoDMY($rw->tgl_kegiatan); ?>" required> 
+                </div>
+            </div>	
+
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Tutup</button>
+        <button type="submit" class="btn btn-primary" id="btnsimpan">Simpan</button>
+    </div>
+</form>
+<script>
+    $('#butir').select2({
+        'width': '100%',
+		'dropdownParent': $("#largeModal")
+    });
+	 $('.datepicker').datetimepicker({
+            format: 'DD-MM-YYYY',
+        });
+    $('#formmodal').validate({
+        rules: {
+        },
+        messages: {
+        },
+        highlight: function(input) {
+            $(input).parents('.form-line').addClass('alert-danger');
+        },
+        unhighlight: function(input) {
+            $(input).parents('.form-line').removeClass('alert-danger');
+        },
+        errorPlacement: function(error, element) {
+            $(element).parents('.group').append(error);
+        }
+    });
+</script>
+<?php } ?>
