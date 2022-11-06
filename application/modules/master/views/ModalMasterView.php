@@ -105,6 +105,87 @@ $rw = $query->row();
     });
 </script>
 <?php } ?>
+<?php if ($action == 'ssouser') {
+?>
+<form action="<?php echo base_url(); ?>master/updateUserSSO" method="post" name="formmodal" id="formmodal" enctype="multipart/form-data">
+    <input type="hidden" name="action" value="<?php echo $action; ?>" />
+    <div class="modal-header">
+        <h4 class="modal-title">User</h4>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+    </div>
+
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-md-12 group">
+                <div class="form-group">
+                    <label for="pegawai">NIP SIMSDM</label>
+                    <select id="pegawai" name="pegawai" class="form-control form-control-sm" required></select>
+                </div>
+            </div>
+            
+            <div class="col-md-12 group">
+                <div class="form-group">
+                    <label for="roles">Role</label>
+                    <?php
+                        if (!empty($rw)) $status=$rw->RolesId; else $status="";
+                        $list=array('Administrator','Admin Sekretariat');
+                        $list2=array('1','2');
+                        echo $this->ReferensiModel->LoadList($list,$list2,'roles',$status,'class="form-control custom-select" required','');
+                    ?>
+                </div>
+            </div>
+            
+
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Tutup</button>
+        <button type="submit" class="btn btn-primary" id="btnsimpan">Simpan</button>
+    </div>
+</form>
+<script>
+   $("#pegawai").select2({
+                ajax: {
+                    url: "<?php echo base_url(); ?>master/caripegawai",
+                    dataType: 'json',
+                    delay: 250,
+                    data: function(params) {
+                        return {
+                            q: params.term // search term
+                        };
+                    },
+                    processResults: function(data) {
+                        return {
+                            results: data
+                        };
+                    },
+                    cache: true
+                },
+                minimumInputLength: 5,
+                width: "100%",
+                dropdownParent: $("#largeModal")
+
+            });
+    $('#formmodal').validate({
+        rules: {
+        },
+        messages: {
+            uname: {
+                remote: "Username sudah ada."
+            },
+        },
+        highlight: function(input) {
+            $(input).parents('.form-line').addClass('alert-danger');
+        },
+        unhighlight: function(input) {
+            $(input).parents('.form-line').removeClass('alert-danger');
+        },
+        errorPlacement: function(error, element) {
+            $(element).parents('.group').append(error);
+        }
+    });
+</script>
+<?php } ?>
 <?php if ($action=='dokumen'){
 $query = $this->db->get_where('kamus_dupak', array('hid' => $this->input->get('thid')));
 $rw = $query->row();

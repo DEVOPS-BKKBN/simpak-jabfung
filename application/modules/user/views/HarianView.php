@@ -41,7 +41,7 @@
 												
 												$n=0;
 									
-												$sql="SELECT a.*,b.butir_kegiatan,DATE_FORMAT(a.tgl_kegiatan,'%d=%m-%Y') tgl FROM harian a JOIN kamus_kegiatan b ON a.kegiatan_id=b.hid AND a.created_by='".$this->session->userdata('userName')."'";
+												$sql="SELECT a.*,b.butir_kegiatan,DATE_FORMAT(a.tgl_kegiatan,'%d-%m-%Y') tgl FROM harian a JOIN kamus_kegiatan b ON a.kegiatan_id=b.hid AND a.created_by='".$this->session->userdata('userName')."'";
 												
 												$pangkat = $this->db->query($sql);
 												foreach ($pangkat->result() as $rw){

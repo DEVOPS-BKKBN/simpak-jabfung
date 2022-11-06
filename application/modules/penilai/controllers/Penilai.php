@@ -88,12 +88,25 @@ class Penilai extends MX_Controller
 	function finishdupak(){
 		
 		$penilaiid=$this->ReferensiModel->LoadSQL("SELECT hid judul FROM penilai WHERE nip='".$this->session->userdata('userName')."'");
-		
+		$namapenilai=$this->ReferensiModel->LoadSQL("SELECT namalengkap judul FROM penilai WHERE nip='".$this->session->userdata('userName')."'");
 		// cek apakah semua sdh dicek
+		// cek apakah ada yang masih direvisi
+
+
 		//$sql="SELECT SUM(CASE WHEN penilaiandate IS NOT NULL THEN 1 ELSE 0 END) jmlnilai,SUM(1) jml FROM dupak WHERE pemohon_id='".$this->input->post('hid')."'";
-		$sql="SELECT SUM(1) jml,SUM(nilai) jmlnilai FROM (SELECT a.hid,(SELECT SUM(1) FROM dupak_penilai WHERE dupak_id=a.hid AND penilai_id='$penilaiid') nilai  FROM dupak a WHERE pemohon_id='".$this->input->post('hid')."' ) a";
+		$sql="SELECT SUM(1) jml,SUM(nilai) jmlnilai,SUM(revisi) revisi FROM (
+			SELECT a.hid,
+			(SELECT SUM(1) FROM dupak_penilai WHERE dupak_id=a.hid AND penilai_id='$penilaiid') nilai,
+			(SELECT SUM(1) FROM dupak_penilai WHERE dupak_id=a.hid AND penilai_id='$penilaiid' AND status='3') revisi    
+		FROM dupak a WHERE pemohon_id='".$this->input->post('hid')."' ) a";
 		$cn=$this->db->query($sql);
 		$rw=$cn->row();
+		
+
+		if ($rw->revisi > 0){
+			echo "Masih ada butir kegiatan yang harus direvisi Pegawai.\nJumlah butir direvisi : ".($rw->revisi)." dari ".$rw->jml;	
+			exit();
+		}
 		
 		if ($rw->jml == $rw->jmlnilai){
 			echo 'sukses';
@@ -107,9 +120,33 @@ class Penilai extends MX_Controller
 			
 			$this->ReferensiModel->insert_logs($this->session->userdata('userName'),'create','selesaikan penilaian',$this->input->post('hid'),'pemohon');
 			
+			// kirim notif ke admin sekretariat
+			$sql="SELECT Username FROM `users` WHERE RolesId='2'";
+			$cn2 = $this->db->query($sql);
+			foreach ($cn2->result() as $rw2){
+				
+				$sql="SELECT a.*,CONCAT(DATE_FORMAT(startdate,'%d %b %Y'),' s.d ',DATE_FORMAT(enddate,'%d %b %Y')) periode 
+				FROM pemohon a JOIN periode b ON a.periode_hid=b.hid WHERE a.hid='".$this->input->post('hid')."'";
+				//echo $sql;
+				$cn=$this->db->query($sql);
+				$rw=$cn->row();
+
+				$isinotifikasi='Tanggal '.date("d-m-Y H:i:s").'
+								<br>Penilaian selesai oleh penilai : '.$namapenilai.'
+								<br>Nomor PAK : '.$this->ReferensiModel->NomorDUPAK($rw->hid).'
+								<br>Periode PAK : '.$rw->periode.'
+								<br>NIP, Nama Pegawai : '.$rw->nip.','.$rw->namalengkap.'
+								<br>Selanjutnya : <a href="'.base_url().'penilaian/pleno">Jadwal Pleno</a>
+								<br>Terima Kasih';
+								
+					//send_notifikasi($mailfrom,$sbj,$msg,$sendto,$username)				
+					$this->ProsesModel->send_notifikasi('auto reply','Penilaian selesai oleh penilai : '.$namapenilai.', PAK :'.$rw->namalengkap,$isinotifikasi,$rw2->Username,$this->session->userdata('userName'));
+
+			}
+
 			$this->session->set_flashdata('response','<div class="alert alert-success m-t-40">Penilaian berhasil diselesaikan. </div>'); 
 		}else{
-			echo "Penilian belum lengkap.\nJumlah butir yang sudah dinilai : ".($rw->jmlnilai)." dari ".$rw->jml;		
+			echo "Penilaian belum lengkap.\nJumlah butir yang sudah dinilai : ".($rw->jmlnilai)." dari ".$rw->jml;		
 		}
 		
 		exit();

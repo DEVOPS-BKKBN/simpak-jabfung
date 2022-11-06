@@ -7,9 +7,8 @@
 							<?php
 								// jika level user user ambil dari simsdm
 								
-								
-								
-								if ($this->session->userdata('leveluser')=='' || $this->session->userdata('leveluser')=='3') echo '<img src="'.URL_FOTO_SIMSDM.'/'.$this->session->userdata('foto').'" alt="..." class="avatar-img rounded-circle">';
+															
+								if ($this->session->userdata('leveluser')=='' || $this->session->userdata('leveluser')=='3' || $this->session->userdata('leveluser')=='2') echo '<img src="'.URL_FOTO_SIMSDM.'/'.$this->session->userdata('foto').'" alt="..." class="avatar-img rounded-circle">';
 								else {
 									if ($this->session->userdata('foto')=='')
 										echo '<img src="'.base_url().'assets/img/profile.jpg" class="avatar-img rounded-circle">';
@@ -73,6 +72,32 @@
 					
 					?>
 					<?php if ($this->session->userdata('leveluser')==''){ ?>
+						<li class="nav-item submenu <?php if ($urlmenu=='feedbackpak' || $urlmenu=='mypak' || $urlmenu=='listpak') echo 'active'; ?>">
+							<a data-toggle="collapse" href="#sidebarLayouts" class="" >
+								<i class="fab fa-wpforms"></i>
+								<p>PAK</p>
+								<span class="caret"></span>
+							</a>
+							<div class="collapse <?php if ($urlmenu=='feedbackpak' || $urlmenu=='mypak' || $urlmenu=='listpak') echo 'show'; ?>" id="sidebarLayouts">
+								<ul class="nav nav-collapse">
+									<li>
+										<a href="<?php echo base_url(); ?>user/mypak">
+											<span class="sub-item">PAK Saya</span>
+										</a>
+									</li>
+									<li>
+										<a href="<?php echo base_url(); ?>user/listpak">
+											<span class="sub-item">Daftar</span>
+										</a>
+									</li>
+									<li>
+										<a href="<?php echo base_url(); ?>user/feedbackpak">
+											<span class="sub-item">Feedback</span>
+										</a>
+									</li>
+								</ul>
+							</div>
+						</li>
 					<li class="nav-item <?php if ($urlmenu=='dupak') echo 'active'; ?>">
 							<a href="<?php echo base_url(); ?>user/dupak">
 								<i class="fas fa-clipboard-list"></i>
@@ -80,6 +105,7 @@
 							</a>
 							
 					</li>
+					
 					<li class="nav-item <?php if ($urlmenu=='harian') echo 'active'; ?>">
 							<a href="<?php echo base_url(); ?>user/harian">
 								<i class="fas fa-calendar-plus"></i>
@@ -115,18 +141,78 @@
 							</div>
 						</li>
 					<?php } ?>
-					<?php if ($this->session->userdata('leveluser')=='1'){ ?>
-						<li class="nav-item submenu <?php if ($urlmenu=='users' || $urlmenu=='kamus' || $urlmenu=='jenisjabatan' || $urlmenu=='jabatan' || $urlmenu=='kelompok' || $urlmenu=='listkelompok'|| $urlmenu=='pejabatjf') echo 'active'; ?>">
+					<?php if ($this->session->userdata('leveluser')=='2'){ 						
+					?>
+						<li class="nav-item submenu <?php if ($urlmenu=='role' || $urlmenu=='users' || $urlmenu=='kamus' || $urlmenu=='jenisjabatan' || $urlmenu=='jabatan' || $urlmenu=='kelompok' || $urlmenu=='listkelompok'|| $urlmenu=='pejabatjf') echo 'active'; ?>">
 							<a data-toggle="collapse" href="#sidebarLayouts" class="" >
 								<i class="fas fa-th-list"></i>
 								<p>Master</p>
 								<span class="caret"></span>
 							</a>
-							<div class="collapse <?php if ($urlmenu=='users' || $urlmenu=='kamus' || $urlmenu=='jenisjabatan' || $urlmenu=='jabatan' || $urlmenu=='kelompok' || $urlmenu=='listkelompok'|| $urlmenu=='pejabatjf') echo 'show'; ?>" id="sidebarLayouts">
+							<div class="collapse <?php if ($urlmenu=='role' || $urlmenu=='users' || $urlmenu=='kamus' || $urlmenu=='jenisjabatan' || $urlmenu=='jabatan' || $urlmenu=='kelompok' || $urlmenu=='listkelompok'|| $urlmenu=='pejabatjf') echo 'show'; ?>" id="sidebarLayouts">
+								<ul class="nav nav-collapse">								
+									<li>
+										<a href="<?php echo base_url(); ?>master/kamus">
+											<span class="sub-item">Butir Angka Kredit</span>
+										</a>
+									</li>
+								</ul>
+							</div>
+						</li>
+						<li class="nav-item submenu <?php if ($urlmenu=='penilaianpleno' || $urlmenu=='dtlpleno' || $urlmenu=='periode' || $urlmenu=='penilai'  || $urlmenu=='bap' || $urlmenu=='pleno' || $urlmenu=='distribusi' || $urlmenu=='dtldistribusi') echo 'active'; ?>">
+							<a data-toggle="collapse" href="#forms" class="">
+								<i class="fas fa-pen-square"></i>
+								<p>Penilaian</p>
+								<span class="caret"></span>
+							</a>
+							<div class="collapse <?php if ($urlmenu=='penilaianpleno' || $urlmenu=='dtlpleno' || $urlmenu=='periode' || $urlmenu=='penilai'  || $urlmenu=='bap' || $urlmenu=='pleno' || $urlmenu=='distribusi' || $urlmenu=='dtldistribusi') echo 'show'; ?>" id="forms">
+								<ul class="nav nav-collapse">
+									<li>
+										<a href="<?php echo base_url(); ?>penilaian/periode">
+											<span class="sub-item">Setting Periode</span>
+										</a>
+									</li>
+									<li>
+										<a href="<?php echo base_url(); ?>penilaian/penilai">
+											<span class="sub-item">Setting Tim Penilai</span>
+										</a>
+									</li>
+									<li>
+										<a href="<?php echo base_url(); ?>penilaian/distribusi">
+											<span class="sub-item">Distribusi Penilaian</span>
+										</a>
+									</li>
+									<li>
+										<a href="<?php echo base_url(); ?>penilaian/pleno">
+											<span class="sub-item">Jadwal Pleno</span>
+										</a>
+									</li>
+									<li>
+										<a href="<?php echo base_url(); ?>penilaian/bap">
+											<span class="sub-item">BAP</span>
+										</a>
+									</li>
+								</ul>
+							</div>
+						</li>
+					<?php } ?>
+					<?php if ($this->session->userdata('leveluser')=='1'){ ?>
+						<li class="nav-item submenu <?php if ($urlmenu=='role' || $urlmenu=='users' || $urlmenu=='kamus' || $urlmenu=='jenisjabatan' || $urlmenu=='jabatan' || $urlmenu=='kelompok' || $urlmenu=='listkelompok'|| $urlmenu=='pejabatjf') echo 'active'; ?>">
+							<a data-toggle="collapse" href="#sidebarLayouts" class="" >
+								<i class="fas fa-th-list"></i>
+								<p>Master</p>
+								<span class="caret"></span>
+							</a>
+							<div class="collapse <?php if ($urlmenu=='role' || $urlmenu=='users' || $urlmenu=='kamus' || $urlmenu=='jenisjabatan' || $urlmenu=='jabatan' || $urlmenu=='kelompok' || $urlmenu=='listkelompok'|| $urlmenu=='pejabatjf') echo 'show'; ?>" id="sidebarLayouts">
 								<ul class="nav nav-collapse">
 									<li>
 										<a href="<?php echo base_url(); ?>master/users">
 											<span class="sub-item">Users</span>
+										</a>
+									</li>
+									<li>
+										<a href="<?php echo base_url(); ?>master/role">
+											<span class="sub-item">Daftar Level Pengguna</span>
 										</a>
 									</li>
 									<li>

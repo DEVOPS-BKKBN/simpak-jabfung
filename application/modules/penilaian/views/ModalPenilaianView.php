@@ -83,6 +83,110 @@ $rw = $query->row_array();
 </script>
 <?php } ?>
 
+<?php if ($action == 'modalbap') {
+
+$query = $this->db->get_where('(SELECT a.hid,a.notes,namalengkap,b.hasil,mkthn_lama,mkbln_lama,mkthn_baru,mkbln_baru FROM pleno_lines a JOIN pemohon b ON a.pemohon_id=b.hid) a', array('hid' => $hid));
+$rw = $query->row_array();
+
+?>
+<form action="<?php echo base_url(); ?>penilaian/updateNoteBAP" method="post" name="formmodal" id="formmodal" enctype="multipart/form-data">
+    <input type="hidden" name="hid" value="<?php echo $hid; ?>" />
+    <input type="hidden" name="periode" value="<?php echo $this->input->get('periode'); ?>" />
+    <input type="hidden" name="tab" value="<?php echo $this->input->get('tab'); ?>" />
+    <div class="modal-header">
+        <h4 class="modal-title">Feedback BAP | <?php echo $rw['namalengkap']; ?></h4>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+    </div>
+
+    <div class="modal-body">
+        <div class="row">
+            
+            <div class="col-md-12 group">
+                <div class="form-group">
+                    <label>Hasil Akhir</label>
+                    <textarea name="hasil" class="form-control" rows="2"><?php if (!empty($rw)) echo $rw['hasil']; ?></textarea>
+                </div>	
+                
+            </div>
+            <div class="col-md-3 group">
+                <div class="form-group">
+                    <label>MK Tahun Lama</label>
+                    <input type="text" name="mkthnlama" class="form-control number" value="<?php if (!empty($rw)) echo $rw['mkthn_lama']; ?>" required> 
+                </div>
+            </div>
+            <div class="col-md-3 group">
+                <div class="form-group">
+                    <label>MK Bulan Lama</label>
+                    <input type="text" name="mkblnlama" class="form-control number" value="<?php if (!empty($rw)) echo $rw['mkbln_lama']; ?>" required> 
+                </div>
+            </div>
+            <div class="col-md-3 group">
+                <div class="form-group">
+                    <label>MK Tahun Baru</label>
+                    <input type="text" name="mkthnbaru" class="form-control number" value="<?php if (!empty($rw)) echo $rw['mkthn_baru']; ?>" required> 
+                </div>
+            </div>
+            <div class="col-md-3 group">
+                <div class="form-group">
+                    <label>MK Bulan Baru</label>
+                    <input type="text" name="mkblnbaru" class="form-control number" value="<?php if (!empty($rw)) echo $rw['mkbln_baru']; ?>" required> 
+                </div>
+            </div>
+            <div class="col-md-12 group">
+                <div class="form-group">
+                    <label>Feedback BAP</label>
+                    <textarea name="keterangan" class="form-control" rows="8"><?php if (!empty($rw)) echo $rw['notes']; ?></textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Tutup</button>
+        <button type="submit" class="btn btn-primary" id="btnsimpan">Simpan</button>
+    </div>
+</form>
+<script>
+    $('.datepicker').datetimepicker({
+            format: 'DD-MM-YYYY',
+        });
+    $(".number").keydown(function(event){
+									if (event.shiftKey == true) {
+										event.preventDefault();
+									}
+							
+									if ((event.keyCode >= 48 && event.keyCode <= 57) || 
+										(event.keyCode >= 96 && event.keyCode <= 105) || 
+										event.keyCode == 8 || event.keyCode == 9 || event.keyCode == 37 ||
+										event.keyCode == 39 || event.keyCode == 46 || event.keyCode == 190 || event.keyCode == 110 || event.keyCode == 86) {
+										
+																	
+							
+									} else {
+										event.preventDefault();
+									}
+									console.log(event.keyCode);
+									if($(this).val().indexOf('.') !== -1 && event.keyCode == 190)
+										event.preventDefault(); 
+									//if a decimal has been added, disable the "."-button
+								})
+    $('#formmodal').validate({
+        rules: {
+        },
+        messages: {
+        },
+        highlight: function(input) {
+            $(input).parents('.form-line').addClass('alert-danger');
+        },
+        unhighlight: function(input) {
+            $(input).parents('.form-line').removeClass('alert-danger');
+        },
+        errorPlacement: function(error, element) {
+            $(element).parents('.group').append(error);
+        }
+    });
+</script>
+<?php } ?>
+
 <?php if ($action == 'periode') {
 
 $query = $this->db->get_where('periode', array('hid' => $hid));
@@ -156,6 +260,12 @@ $rw = $query->row_array();
                         echo $this->ReferensiModel->LoadListMaster($sql, 'pegawai', $pejabat, 'class="form-control" required');
                     ?>
                     
+                </div>
+            </div>
+            <div class="col-md-12 group">	
+                <div class="form-group">
+                    <label>Jabatan</label>
+                    <input type="text" name="jabatan" class="form-control" value="<?php if (!empty($rw)) echo $rw['jabatanpejabat_pak']; ?>" >
                 </div>
             </div>
             <div class="col-md-12 group">	

@@ -9,9 +9,9 @@ class Master extends MX_Controller
         $this->load->model('login/ProsesModel');
         $this->load->model('login/ReferensiModel');
         
-        if( $this->session->userdata('leveluser')!='1'  ) {
-           redirect(base_url().'login/show_login');
-        }
+        if( $this->session->userdata('leveluser')=='1' || $this->session->userdata('leveluser')=='2') {
+           
+        }else {redirect(base_url().'login/show_login');}
         
     }
 	public function add_template (){
@@ -290,6 +290,88 @@ class Master extends MX_Controller
 		
 		redirect('master/jenisjabatan', 'refresh');
     }
+	public function updateUserSSO(){
+		$pegawai=explode('|',$this->input->post('pegawai'));
+		$niplama=$pegawai[1];
+		$nipbaru=$pegawai[0];
+		$foto=$pegawai[2];
+		
+		$num=$this->ReferensiModel->LoadSQL("SELECT COUNT(*) judul FROM users WHERE Username='$nipbaru'");
+		if ($num>0){
+			$this->session->set_flashdata('response','<div class="alert alert-danger m-t-40">NIP sudah ada di master. </div>');
+			redirect('master/users');
+			exit();
+		}	
+		
+		$urlapi=URL_SIMSDM."index.php/ProsesController/dtlPegawai";
+		$data = array("token" => TOKEN_SIMSDM,"nip"=>$niplama);
+		$post = json_encode($data);
+
+			
+			
+		$ch = curl_init();
+		curl_setopt($ch, CURLOPT_URL,$urlapi);
+		curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+		curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+		'Content-Type: application/json',
+		'Content-Length: ' . strlen($post))
+		);
+
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER,1);
+		$result=curl_exec ($ch);
+
+		curl_close ($ch);
+		$json = json_decode($result, true);
+		
+		$dataoutput=array(
+			'Username'=>$nipbaru,
+			'EmployeeId'=>$nipbaru,
+			'Jabatan'=>$json[0]['jabatan'],
+			'PangkatGol '=>$json[0]['golongaan'],
+			'BiroName'=>$json[0]['biro'],
+			'Foto'=>$foto,
+			'creationdate'=>date("Y-m-d H:i:s"),
+			'createdby'=>$this->session->userdata('userName'),
+			'RolesId'=>$this->input->post('roles')
+		);
+		
+		// ambil nama lengkap dari data utama
+		$urlapi=URL_SIMSDM."index.php/ProsesController/dataUtama";
+		$data = array("token" => TOKEN_SIMSDM,"nip"=>$niplama);
+		$post = json_encode($data);
+
+			
+			
+		$ch = curl_init();
+		curl_setopt($ch, CURLOPT_URL,$urlapi);
+		curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+		curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+		'Content-Type: application/json',
+		'Content-Length: ' . strlen($post))
+		);
+
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER,1);
+		$result=curl_exec ($ch);
+
+		curl_close ($ch);
+		$json = json_decode($result, true);
+		
+		$dataoutput=array_merge($dataoutput,array('DisplayName'=>$json[0]['namalengkap']));
+		
+		$this->ProsesModel->insert_personal($dataoutput,'users');
+		$this->session->set_flashdata('response','<div class="alert alert-success m-t-40">Data berhasil ditambahkan. </div>');
+        
+		redirect('master/users');
+
+	}
     public function caripegawai(){
 		
 		$urlapi=URL_SIMSDM."index.php/ProsesController/searchPenilai";
@@ -327,26 +409,52 @@ class Master extends MX_Controller
 		echo json_encode($answer);
 	}
     function jenjang() {
+		if( $this->session->userdata('leveluser')!='1') {
+			redirect(base_url().'login/show_login');
+			exit();
+		}
         $data['judulpage']='Jenjang Jabatan';
         $data['action']='jenjang';
         $this->load->view('JenjangView',$data);
        
     }
 	function jenisjabatan() {
+		if( $this->session->userdata('leveluser')!='1') {
+			redirect(base_url().'login/show_login');
+			exit();
+		}
         $data['judulpage']='Jenis Jabatan';
         $data['action']='jenjang';
         $this->load->view('JenjangView',$data);
        
     }
 	function pejabatjf() {
+		if( $this->session->userdata('leveluser')!='1') {
+			redirect(base_url().'login/show_login');
+			exit();
+		}
         $data['judulpage']='Daftar Pejabat Fungsional';
         $data['action']='pejabatjf';
         $this->load->view('PegawaiJFView',$data);
        
     }
     function users() {
+		if( $this->session->userdata('leveluser')!='1') {
+			redirect(base_url().'login/show_login');
+			exit();
+		}
         $data['judulpage']='Master User';
         $data['action']='users';
+        $this->load->view('UsersView',$data);
+       
+    }
+	function role() {
+		if( $this->session->userdata('leveluser')!='1') {
+			redirect(base_url().'login/show_login');
+			exit();
+		}
+        $data['judulpage']='Master Level Pengguna';
+        $data['action']='role';
         $this->load->view('UsersView',$data);
        
     }

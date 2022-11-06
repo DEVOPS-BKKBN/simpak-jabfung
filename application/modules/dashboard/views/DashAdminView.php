@@ -119,18 +119,22 @@
 									
 										$sql="SELECT nip,foto,b.namalengkap,SUM(1) ttl FROM pemohon_penilai a JOIN penilai b ON a.penilai_id=b.hid GROUP BY nip,foto,namalengkap ORDER BY ttl DESC;";
 										$cn = $this->db->query($sql);
-										foreach ($cn->result() as $rw){
-											if ($rw->foto!='') $img=URL_FOTO_SIMSDM.'/'.$rw->foto; else $img=base_url().'assets/img/profile.jpg';
+										foreach ($cn->result() as $rwp){
+											if ($rwp->foto!='') {
+												$img=URL_FOTO_SIMSDM.'/'.$rwp->foto; 
+												if (file_exists($img)) $img=URL_FOTO_SIMSDM.'/'.$rwp->foto; else $img=base_url().'assets/img/profile.jpg';
+												}
+												else $img=base_url().'assets/img/profile.jpg';
 											echo '<div class="d-flex">
 												<div class="avatar">
-													<img src="'.$img.'" alt="'.$rw->namalengkap.'" class="avatar-img rounded-circle">
+													<img src="'.$img.'" alt="'.$rwp->namalengkap.'" class="avatar-img rounded-circle">
 												</div>
 												<div class="flex-1 pt-1 ml-2">
-													<h6 class="fw-bold mb-1">'.$rw->namalengkap.'</h6>
-													<small class="text-muted">'.$rw->nip.'</small>
+													<h6 class="fw-bold mb-1">'.$rwp->namalengkap.'</h6>
+													<small class="text-muted">'.$rwp->nip.'</small>
 												</div>
 												<div class="d-flex ml-auto align-items-center">
-													<h3 class="text-info fw-bold">'.$rw->ttl.'</h3>
+													<h3 class="text-info fw-bold">'.$rwp->ttl.'</h3>
 												</div>
 											</div>
 											<div class="separator-dashed"></div>';

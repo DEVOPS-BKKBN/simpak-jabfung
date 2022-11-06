@@ -391,7 +391,7 @@ $rw = $query->row();
             </div>
 			 <div class="col-md-4 group">
                 <div class="form-group">
-                    <label>Tanggl Kegiatan</label>
+                    <label>Tanggal Kegiatan</label>
                     <input type="text" name="tgl" class="form-control datepicker" value="<?php if (!empty($rw)) echo $this->ReferensiModel->YMDtoDMY($rw->tgl_kegiatan); ?>" required> 
                 </div>
             </div>	

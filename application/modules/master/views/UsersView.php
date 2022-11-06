@@ -9,6 +9,7 @@
             <div class="content">
                 <div class="page-inner">
                     <?php echo $this->session->flashdata('response'); ?>
+                    <?php if ($action=='users'){ ?>
                     <div class="row">
                         <div class="col-md-12">
                             <div class="card">
@@ -20,6 +21,10 @@
                                                 <span class="btn-label">
                                                     <i class="fa fa-plus"></i>
                                                 </span> Tambah</a>
+                                                <a href="<?php echo base_url(); ?>master/modal?action=ssouser" class="btn btn-secondary btn-round ls-modal">
+                                                <span class="btn-label">
+                                                    <i class="fa fa-plus"></i>
+                                                </span> Tambah SSO SIMSDM</a>
                                         </div>
                                     </div>
                                 </div>
@@ -62,6 +67,37 @@
                         </div>
 
                     </div>
+                    <?php } ?>
+                    <?php if ($action=='role'){ ?>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h4 class="card-title">Master Level Pengguna</h4>
+                                </div>
+
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table id="datatable" class="display table table-striped table-hover dataTable">
+                                            <thead>
+                                                <tr>
+                                                    <th>No</th>
+                                                    <th scope="col">ID</th>
+                                                    <th scope="col">Level</th>	
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr><td>1</td><td>1</td><td>Administrator</td></tr>
+                                                <tr><td>2</td><td>2</td><td>Sekretariat</td></tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <?php } ?>
                 </div>
             </div>
             <?php $this->load->view('sites/Footer'); ?>

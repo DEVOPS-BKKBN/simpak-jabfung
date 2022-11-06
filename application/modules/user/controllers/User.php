@@ -14,6 +14,24 @@ class User extends MX_Controller
         }
         
     }
+	public function cetakpaktte(){
+		include('assets/js/plugin/phpqrcode/qrlib.php'); 
+
+		$sql="SELECT a.*,DATE_FORMAT(tmtgol,'%d-%m-%Y') tmtgol,DATE_FORMAT(tmtjab,'%d-%m-%Y') tmtjab,DATE_FORMAT(tgllahir,'%d-%m-%Y') tgllahir,
+		CONCAT(DATE_FORMAT(startdate,'%b'),' s.d ',DATE_FORMAT(enddate,'%b Tahun %Y')) periode,
+		pejabat_pak,nippejabat_pak,jabatanpejabat_pak,tgl_surat,b.startdate,
+		(SELECT startdate FROM dupak_v WHERE nip=a.nip AND startdate < b.startdate ORDER BY startdate DESC LIMIT 1) startdatebefore
+		FROM pemohon a JOIN periode b ON a.periode_hid=b.hid
+		WHERE md5(CONCAT('".TOKEN_DOP."',a.hid))='".$this->input->get('hid')."'";
+		
+		//echo $sql;exit();
+		$cn=$this->db->query($sql);
+		$rw=$cn->row();
+		
+		$url=URL_TTESIMSDM.'/'.$rw->tte_file;
+		
+		QRcode::png($url);
+	}
 	public function caripegawai(){
 		
 		$urlapi=URL_SIMSDM."index.php/ProsesController/searchPenilai";
@@ -288,13 +306,32 @@ class User extends MX_Controller
 		$totalup=$this->ReferensiModel->LoadSQL("SELECT COUNT(*)judul FROM dokumen WHERE pemohon_hid='".$rw->hid."'");
 		
 				
-		if ($totaldok==$totalup){
+		if ($totaldok<=$totalup){
 			echo 'sukses';
 			$sql="UPDATE pemohon SET status='2',updateddate=NOW(),updatedby='".$this->session->userdata('userName')."' WHERE hid='".$this->input->post('hid')."' AND nip='".$this->session->userdata('userName')."'";
 			$save=$this->db->query($sql);
 						
 			$this->ReferensiModel->insert_logs($this->session->userdata('userName'),'create','kirim dupak',$this->input->post('hid'),'pemohon');
 			$this->session->set_flashdata('response','<div class="alert alert-success m-t-40">Data berhasil dikirim ke ADMIN SEKRETARIAT. </div>'); 
+		
+			// kirim notifikasi
+			$sql="SELECT Username FROM `users` WHERE RolesId='2'";
+			$cn2 = $this->db->query($sql);
+			foreach ($cn2->result() as $rw2){
+					
+				$isinotifikasi='Tanggal '.date("d-m-Y H:i:s").'
+								<br>Permohonan / Usulan PAK
+								<br>Nomor PAK : '.$this->ReferensiModel->NomorDUPAK($rw->hid).'
+								<br>Periode PAK : '.$rw->periode.'
+								<br>NIP, Nama Pegawai : '.$rw->nip.','.$rw->namalengkap.'
+								<br>Selanjutnya : <a href="'.base_url().'penilaian/dtldistribusi?jenis=belum&phid='.md5(TOKEN_DOP.$rw->periode_hid).'">Distribusi Penilaian</a>
+								<br>Terima Kasih';
+								
+					//send_notifikasi($mailfrom,$sbj,$msg,$sendto,$username)				
+					$this->ProsesModel->send_notifikasi('auto reply','Permohonan / Usulan PAK : '.$rw->namalengkap,$isinotifikasi,$rw2->Username,$this->session->userdata('userName'));
+
+			}
+		
 		}else{
 			echo "Dokumen fisik yang diupload belum lengkap.\nDokumen Fisik terupload : ".($totalup*1)." dari ".$totaldok;
 		}
@@ -481,12 +518,48 @@ class User extends MX_Controller
 			$data=array_merge($data,array('creation_date'=>date("Y-m-d H:i:s"),'created_by'=>$this->session->userdata('userName')));
 			$this->ProsesModel->insert_personal($data,'harian');
 			$this->session->set_flashdata('response', $this->ReferensiModel->showMessage('Data telah berhasil ditambahkan.', 'success'));
+			
+			// insert into sivika
+			$datas=array(
+				'refkegiatanft_id'=>$this->input->post('butir'),
+				'judul_kegiatan'=>$this->input->post('nama'),
+				'uraian_kegiatan'=>'Sync DOP',
+				'tgl_start'=>$this->ReferensiModel->DMYtoYMD($this->input->post('tgl'))." 08:00",
+				'tgl_end'=>$this->ReferensiModel->DMYtoYMD($this->input->post('tgl'))." 15:30",
+				'status'=>1,
+				'nip1'=>$this->session->userdata('userName'),
+				'nip2'=>$this->ReferensiModel->LoadSQL("SELECT NIPLamaAtasan judul FROM users WHERE Username='".$this->session->userdata('userName')."'"),
+				'creation_date'=>date("Y-m-d H:i:s"),
+				'created_by'=>$this->session->userdata('userName')
+			);
+			$this->ProsesModel->insert_personal($datas,'sivika');
 		}else{
 			$data=array_merge($data,array('updated_date'=>date("Y-m-d H:i:s"),'updated_by'=>$this->session->userdata('userName')));
 			$this->ProsesModel->update_personal($data,$hid,'harian','hid');
 			$this->session->set_flashdata('response', $this->ReferensiModel->showMessage('Sukses mengupdate data.', 'success'));
 		}
 		redirect('user/harian', 'refresh');
+	}
+	function mypak(){
+		$data['judulpage']='PAK Saya';
+        $data['action']='mypak';
+		
+		
+        $this->load->view('MyPAKView',$data);
+	}
+	function listpak(){
+		$data['judulpage']='Daftar PAK';
+        $data['action']='listpak';
+		
+		
+        $this->load->view('ListPAKView',$data);
+	}
+	function feedbackpak(){
+		$data['judulpage']='Feedback PAK';
+        $data['action']='feedbackpak';
+		
+		
+        $this->load->view('FeedbackPAKView',$data);
 	}
 	public function hapusHarian(){
 		

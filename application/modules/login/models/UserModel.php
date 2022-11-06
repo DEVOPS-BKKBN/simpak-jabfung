@@ -82,6 +82,27 @@ class UserModel extends CI_Model {
                     return true;
                     exit();
                   }
+
+                  // apakah user dengan role
+                  $idrole=$this->ReferensiModel->LoadSQL("SELECT RolesId judul FROM users WHERE Username='".$email."'");
+                  if ($idrole>0){
+                    $this->session->set_userdata( array(
+                      'userName'=>$json['NIP'],
+                      'fullName'=>$json['namalengkap'],
+                      'leveluser'=>$idrole,
+                      'isLoggedIn'=>true,
+                      'foto'=>$json['foto'],
+                      'idBiro'=>$this->details->IdBiro,
+                      'BiroName'=>$json['namabiro'],
+                      'kdProv'=>'',
+                      'kdKab'=>'',
+                      'kdKec'=>'',		
+                      )
+                    );
+                    return true;
+                    exit();
+                  }
+
                 }
                 
                 // cek ke table user
@@ -133,6 +154,27 @@ class UserModel extends CI_Model {
                   return true;
                   exit();
                 }
+
+                 // apakah user dengan role
+                 $idrole=$this->ReferensiModel->LoadSQL("SELECT RolesId judul FROM users WHERE Username='".$email."'");
+                 
+                 if ($idrole>0){
+                  $this->session->set_userdata( array(
+                    'userName'=>$json['NIP'],
+                    'fullName'=>$json['namalengkap'],
+                    'leveluser'=>$idrole,
+                    'isLoggedIn'=>true,
+                    'foto'=>$json['foto'],
+                    'idBiro'=>$json['biro'],
+                    'BiroName'=>$json['namabiro'],
+                    'kdProv'=>$json['lokasi_propinsi'],
+                    'kdKab'=>$json['lokasi_kabupaten'],
+                    'kdKec'=>$json['lokasi_kecamatan'],		
+                    )
+                  );
+                   return true;
+                   exit();
+                 }
                 
                 
                 //var_dump($json);

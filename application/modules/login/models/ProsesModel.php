@@ -49,24 +49,16 @@ class ProsesModel extends CI_Model {
 		if (!empty($rw)) return $rw['nama_file']; else return '';
 	}
 	
-	public function send_notifikasi($mailfrom,$sbj,$msg,$sendto,$username,$keyword,$keywordid) {	   
-			//$in_inbox = "INSERT INTO inbox (mailfrom, Subject, message, sendto, tanggal, username, timestamp, randomstring, statuskonfirmasi) VALUES ('$mailfrom','Permintaan Penambahan Data Riwayat Anak Ditolak', '$message', '$rwinb[0]', '$tanggal', '$mailfrom' , '$senddate', '$randomstring', 't')";
-			$randomstring = $this->ProsesModel->rand_string(150);
-			$senddate = time();
-			$tanggal=date("Y/m/d H:i:s");
-			
+	public function send_notifikasi($mailfrom,$sbj,$msg,$sendto,$username) {	   
+			$senddate = date("Y-m-d H:i:s");			
 			$data=array(
 				'mailfrom' => $mailfrom,
 				'subject' => $sbj,
 				'message' => $msg,
 				'sendto' => $sendto,
-				'tanggal' => $tanggal,
-				'username' => $username,
-				'timestamp' => $senddate,
-				'randomstring' => $randomstring,
-				'statuskonfirmasi' => 'y',
-				'keyword'=>$keyword,
-				'keywordid'=>$keywordid
+				'creation_date'=>$senddate,
+				'created_by'=>$username,				
+				
 			);
 			
 			$this->ProsesModel->insert_personal($data,'notifikasi');
@@ -78,6 +70,20 @@ class ProsesModel extends CI_Model {
 			
 			return $rw['judul'];
 	   }
+	   public function NilaiTotalPAKKategori($hid,$kategori){
+		$sql="SELECT ROUND(SUM(total_ak),3) judul FROM dupak a JOIN kamus_kegiatan b ON a.kegiatan_id=b.hid WHERE pemohon_id='$hid' AND kategori='$kategori'";
+		$cn=$this->db->query($sql);
+		$rw=$cn->row_array();
+		
+		return $rw['judul'];
+   		}
+		   public function NilaiTotalPAKKategoriFinal($hid,$kategori){
+			$sql="SELECT ROUND(SUM(total_ak_penilai),3) judul FROM dupak a JOIN kamus_kegiatan b ON a.kegiatan_id=b.hid WHERE pemohon_id='$hid' AND kategori='$kategori'";
+			$cn=$this->db->query($sql);
+			$rw=$cn->row_array();
+			
+			return $rw['judul'];
+			   }
 	   public function NilaiTotalPAKFinal($hid){
 			$sql="SELECT ROUND(SUM(total_ak_penilai),3) judul FROM dupak a JOIN kamus_kegiatan b ON a.kegiatan_id=b.hid WHERE pemohon_id='$hid'";
 			$cn=$this->db->query($sql);
@@ -85,6 +91,23 @@ class ProsesModel extends CI_Model {
 			
 			return $rw['judul'];
 	   }
+	   public function NilaiTotalPAKFinalLama($hid){
+		$sql="SELECT a.*,DATE_FORMAT(tmtgol,'%d-%m-%Y') tmtgol,DATE_FORMAT(tmtjab,'%d-%m-%Y') tmtjab,DATE_FORMAT(tgllahir,'%d-%m-%Y') tgllahir,
+		CONCAT(DATE_FORMAT(startdate,'%b'),' s.d ',DATE_FORMAT(enddate,'%b Tahun %Y')) periode,
+		pejabat_pak,nippejabat_pak,jabatanpejabat_pak,tgl_surat,b.startdate,
+		(SELECT startdate FROM dupak_v WHERE nip=a.nip AND startdate < b.startdate ORDER BY startdate DESC LIMIT 1) startdatebefore
+		FROM pemohon a JOIN periode b ON a.periode_hid=b.hid
+		WHERE a.hid='".$hid."'";
+		
+		$cn=$this->db->query($sql);
+		$rw=$cn->row_array();
+
+		$sql="SELECT SUM(nilaibaru) judul FROM dupak_v WHERE nip='".$rw['nip']."' AND startdate='".$rw['startdatebefore']."'";
+		$cn=$this->db->query($sql);
+		$rw=$cn->row_array();
+		
+		return $rw['judul'];
+   }
 	   public function NilaiTotalPAKPenilai($hid,$penilaiid){
 			$sql="SELECT ROUND(SUM(total_nilai),3) judul FROM dupak a JOIN kamus_kegiatan b ON a.kegiatan_id=b.hid JOIN dupak_penilai c ON a.hid=c.dupak_id WHERE pemohon_id='$hid' AND penilai_id='$penilaiid'";
 			$cn=$this->db->query($sql);

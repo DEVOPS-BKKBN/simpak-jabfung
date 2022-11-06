@@ -57,6 +57,9 @@
 														<th>TMT GOL</th>
 														<th>JABATAN</th>
 														<th>UNIT KERJA</th>
+														<th>UNSUR UTAMA</th>
+														<th>UNSUR PENUNJANG</th>
+														<th>NILAI TOTAL</th>
 														<?php
 														for ($i=1;$i<=NUM_PENILAI;$i++){
 															echo '<th>PAK PENILAI '.$i.'</th>';
@@ -100,11 +103,28 @@
 														echo '<td>'.date("d-m-Y",strtotime($rw2->tmtgol)).'</td>';
 														echo '<td>'.$rw2->jabatan.'</td>';
 														echo '<td>'.$rw2->unitkerja.'</td>';
+														
+														$npenunjang=$this->ProsesModel->NilaiTotalPAKKategori($rw2->hid,'Penunjang');
+														$nutama=$this->ProsesModel->NilaiTotalPAKKategori($rw2->hid,'Utama');
+														$npak=$this->ProsesModel->NilaiTotalPAK($rw2->hid);
+														
+														if ($npak>0) $psnp=$npenunjang/$npak; else $psnp=0;
+														if ($npak>0) $psnu=$nutama/$npak; else $psnu=0;
+
+														if ($psnu<0.8) echo '<td style="background-color:yellow;">'.$nutama.' (Nilai Unsur Utama kurang dari 80%)</td>';
+															else echo '<td>'.$nutama.'</td>';
+														if ($psnp>0.2) echo '<td style="background-color:red;color:white">'.$npenunjang.' (Nilai Unsur Penunjang melebihi 20%)</td>';
+															else echo '<td>'.$npenunjang.'</td>';							
+														if ($npak>17.5) echo '<td style="background-color:red;color:white">'.$npak.' (Nilai sudah melebihi 17,5. Mohon menjadi perhatian)</td>';
+															else echo '<td>'.$npak.'</td>';
+
 														for ($i=1;$i<=NUM_PENILAI;$i++){
 															$penilaiid=$this->ReferensiModel->LoadSQL("SELECT b.hid judul FROM pemohon_penilai a JOIN penilai b ON a.penilai_id=b.hid WHERE a.pemohon_id='".$rw2->hid."' AND a.penilai_ke='$i'");
 															$nilai=$this->ReferensiModel->LoadSQL("SELECT ROUND(SUM(total_nilai),3) judul FROM dupak a JOIN kamus_kegiatan b ON a.kegiatan_id=b.hid JOIN dupak_penilai c ON a.hid=c.dupak_id WHERE pemohon_id='".$rw2->hid."' AND penilai_id='$penilaiid'");
 															echo '<td>'.$nilai.'</td>';
 														}
+
+														
 														echo '<td>'.$this->ProsesModel->NilaiTotalPAKFinal($rw2->hid).'</td>';
 														echo '<td>'.$rw2->statuspleno.'</td>';
 														echo '</tr>';
@@ -149,6 +169,9 @@
 														<th>TMT GOL</th>
 														<th>JABATAN</th>
 														<th>UNIT KERJA</th>
+														<th>UNSUR UTAMA</th>
+														<th>UNSUR PENUNJANG</th>
+														<th>NILAI TOTAL</th>
 														<?php
 														for ($i=1;$i<=NUM_PENILAI;$i++){
 															echo '<th>PAK PENILAI '.$i.'</th>';
@@ -163,7 +186,7 @@
 													
 													$sql="SELECT a.*,DATE_FORMAT(a.tmtjab,'%d-%m-%Y') tmtjab,b.foto,c.namalengkap penilai
 															FROM pemohon a JOIN users b ON a.nip=b.username
-															LEFT JOIN penilai c ON a.penilai_id=c.hid WHERE status='4' AND pleno_date IS NULL";
+															LEFT JOIN penilai c ON a.penilai_id=c.hid WHERE a.status='4' AND pleno_date IS NULL";
 													//echo $sql;
 													$pangkat = $this->db->query($sql);
 													foreach ($pangkat->result() as $rw2){
@@ -185,6 +208,21 @@
 														echo '<td>'.date("d-m-Y",strtotime($rw2->tmtgol)).'</td>';
 														echo '<td>'.$rw2->jabatan.'</td>';
 														echo '<td>'.$rw2->unitkerja.'</td>';
+														
+														$npenunjang=$this->ProsesModel->NilaiTotalPAKKategori($rw2->hid,'Penunjang');
+														$nutama=$this->ProsesModel->NilaiTotalPAKKategori($rw2->hid,'Utama');
+														$npak=$this->ProsesModel->NilaiTotalPAK($rw2->hid);
+														
+														if ($npak>0) $psnp=$npenunjang/$npak; else $psnp=0;
+														if ($npak>0) $psnu=$nutama/$npak; else $psnu=0;
+
+														if ($psnu<0.8) echo '<td style="background-color:yellow;">'.$nutama.' (Nilai Unsur Utama kurang dari 80%)</td>';
+															else echo '<td>'.$nutama.'</td>';
+														if ($psnp>0.2) echo '<td style="background-color:red;color:white">'.$npenunjang.' (Nilai Unsur Penunjang melebihi 20%)</td>';
+															else echo '<td>'.$npenunjang.'</td>';							
+														if ($npak>17.5) echo '<td style="background-color:red;color:white">'.$npak.' (Nilai sudah melebihi 17,5. Mohon menjadi perhatian)</td>';
+															else echo '<td>'.$npak.'</td>';
+
 														for ($i=1;$i<=NUM_PENILAI;$i++){
 															$penilaiid=$this->ReferensiModel->LoadSQL("SELECT b.hid judul FROM pemohon_penilai a JOIN penilai b ON a.penilai_id=b.hid WHERE a.pemohon_id='".$rw2->hid."' AND a.penilai_ke='$i'");
 															$nilai=$this->ReferensiModel->LoadSQL("SELECT ROUND(SUM(total_nilai),3) judul FROM dupak a JOIN kamus_kegiatan b ON a.kegiatan_id=b.hid JOIN dupak_penilai c ON a.hid=c.dupak_id WHERE pemohon_id='".$rw2->hid."' AND penilai_id='$penilaiid'");

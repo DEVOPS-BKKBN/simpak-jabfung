@@ -39,7 +39,7 @@ WHERE b.hid IN(SELECT hid FROM jabatan WHERE kode_jab='".$rw->kdjab."' AND delet
                     <?php if ($tab==''){?>
                     <div class="tab-pane fade active show" id="pills-home-icon" role="tabpanel" aria-labelledby="pills-home-tab-icon">
                         <div class="table-responsive">
-							<?php if ($status==1){ ?><button type="button" class="btn btn-sm waves-effect waves-light btn-info mb-4 mt-4" id="btnkirim" data-id="<?php echo $rw->hid; ?>">KIRIM KE ADMIN SEKRETARIAT</button><?php } ?>
+							<?php if ($status==1 && $num>0){ ?><button type="button" class="btn btn-sm waves-effect waves-light btn-info mb-4 mt-4" id="btnkirim" data-id="<?php echo $rw->hid; ?>">KIRIM KE ADMIN SEKRETARIAT</button><?php } ?>
                                     <table class="table table-striped">
                                         <tbody>
                                             <tr>

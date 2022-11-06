@@ -68,14 +68,16 @@
 						<span class="step-name">Selesai</span>
 						<span class="visuallyhidden">Step </span><span class="step-num">6</span>
 					</li>
-				</ol>
+				</ol>				
 				<?php } ?>
 			</div>
-			<?php
+			
+				<?php
 					if ($rw['status']=='')
 					echo '<a href="" class="btn btn-primary daftar" data-id="'.$rw['hid'].'">DAFTAR</a>';
 					else echo '<a href="'.base_url().'user/detildupak?hid='.md5(TOKEN_DOP.$rw['hiddupak']).'" class="btn btn-info">'.strtoupper($rw['status']).'</a>';
 				?>
+				
 		</div>
 		
 	</div>

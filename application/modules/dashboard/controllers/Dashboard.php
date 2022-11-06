@@ -17,4 +17,15 @@ class Dashboard extends MX_Controller
       $data['judulpage']='Dashboard';
       $this->load->view('DashboardView',$data);
   }
+  function notifikasi()
+  {
+      $data['judulpage']='Notifikasi';
+      $this->load->view('NotifikasiView',$data);
+  }
+  function modal()
+  {
+      $data['action']=$this->input->get('action');
+      $data['hid']=$this->input->get('hid');
+      $this->load->view('ModalDashboardView',$data);
+  }
 }
