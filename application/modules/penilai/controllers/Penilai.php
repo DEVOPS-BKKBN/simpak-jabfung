@@ -153,6 +153,37 @@ class Penilai extends MX_Controller
 		//var_dump($_POST);
 		
 	}
+	function revisidupak(){
+		
+		$penilaiid=$this->ReferensiModel->LoadSQL("SELECT hid judul FROM penilai WHERE nip='".$this->session->userdata('userName')."'");
+		$namapenilai=$this->ReferensiModel->LoadSQL("SELECT namalengkap judul FROM penilai WHERE nip='".$this->session->userdata('userName')."'");
+		
+		$sql="UPDATE pemohon SET status='7',penilaiandate=NOW(),updateddate=NOW(),updatedby='".$this->session->userdata('userName')."' WHERE hid='".$this->input->post('hid')."'";
+		//echo $sql;
+		$save=$this->db->query($sql);
+		
+		$sql="SELECT a.*,CONCAT(DATE_FORMAT(startdate,'%d %b %Y'),' s.d ',DATE_FORMAT(enddate,'%d %b %Y')) periode 
+				FROM pemohon a JOIN periode b ON a.periode_hid=b.hid WHERE a.hid='".$this->input->post('hid')."'";
+				//echo $sql;
+		$cn=$this->db->query($sql);
+		$rw=$cn->row();
+
+				$isinotifikasi='Tanggal '.date("d-m-Y H:i:s").'
+								<br>Ada catatan revisi oleh penilai : '.$namapenilai.'
+								<br>Nomor PAK : '.$this->ReferensiModel->NomorDUPAK($rw->hid).'
+								<br>Periode PAK : '.$rw->periode.'
+								<br>NIP, Nama Pegawai : '.$rw->nip.','.$rw->namalengkap.'
+								<br>Selanjutnya : <a href="'.base_url().'user/detildupak?hid='.md5(TOKEN_DOP.$rw->hid).'">Revisi DUPAK</a>
+								<br>Terima Kasih';
+								
+					//send_notifikasi($mailfrom,$sbj,$msg,$sendto,$username)				
+					$this->ProsesModel->send_notifikasi('auto reply','Catatan Revisi oleh penilai : '.$namapenilai.', PAK :'.$rw->namalengkap,$isinotifikasi,$rw->nip,$this->session->userdata('userName'));
+
+		$this->session->set_flashdata('response','<div class="alert alert-success m-t-40">Revisi Penilaian berhasil dikirim ke Pegawai. </div>'); 
+
+		
+		
+	}
 	function ongoing() {
         $data['judulpage']='Ongoing';
         $data['action']='ongoing';

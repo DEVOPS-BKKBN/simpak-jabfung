@@ -29,10 +29,17 @@
 									</ul>
 										
 									<div class="tab-content mt-2 mb-3" id="pills-with-icon-tabContent">
-										<?php if ($tab==''){?>
+										<?php 
+										// cek if any revision status
+										$sql="SELECT COUNT(*) judul FROM dupak_penilai a JOIN dupak b ON a.dupak_id=b.hid WHERE pemohon_id='$phid' AND penilai_id='$penilaiid' AND a.status='3'";
+										$jmlrev=$this->ReferensiModel->LoadSQL($sql);
+										$statusdupak=$rw->status;
+										
+										if ($tab==''){?>
 											<div class="tab-pane fade active show" id="pills-home-icon" role="tabpanel" aria-labelledby="pills-home-tab-icon">
 												<div class="table-responsive">
-													<?php if ($status==3){ ?><button type="button" class="btn btn-sm waves-effect waves-light btn-info mb-4 mt-4" id="btnkirim" data-id="<?php echo $rw->hid; ?>">SELESAIKAN PENILAIAN</button><?php } ?>
+													<?php if ($status==3 && $jmlrev==0){ ?><button type="button" class="btn btn-sm waves-effect waves-light btn-info mb-4 mt-4" id="btnkirim" data-id="<?php echo $rw->hid; ?>">SELESAIKAN PENILAIAN</button><?php } ?>
+													<?php if (($status==3 || $status==8) && $jmlrev>0){ ?><button type="button" class="btn btn-sm waves-effect waves-light btn-warning mb-4 mt-4" id="btnkirim2" data-id="<?php echo $rw->hid; ?>">SIMPAN & KIRIM KE PEGAWAI</button><?php } ?>
 															<table class="table table-striped">
 																<tbody>
 																	<tr>
@@ -97,7 +104,8 @@
 										<div class="tab-pane p-20 active" id="tabtask" role="tabpanel">
 											<div class="table-responsive">
 												 <form id="form1" name="form1" action="<?php echo base_url(); ?>user/simpandupak" method="post">
-												 <?php if ($status==3){ ?><button type="button" class="btn btn-sm waves-effect waves-light btn-info mb-4 mt-4" id="btnkirim" data-id="<?php echo $rw->hid; ?>">SELESAIKAN PENILAIAN</button><?php } ?>
+												 <?php if ($status==3 && $jmlrev==0){ ?><button type="button" class="btn btn-sm waves-effect waves-light btn-info mb-4 mt-4" id="btnkirim" data-id="<?php echo $rw->hid; ?>">SELESAIKAN PENILAIAN</button><?php } ?>
+												 <?php if (($status==3 || $status==8) && $jmlrev>0){ ?><button type="button" class="btn btn-sm waves-effect waves-light btn-warning mb-4 mt-4" id="btnkirim2" data-id="<?php echo $rw->hid; ?>">SIMPAN & KIRIM KE PEGAWAI</button><?php } ?>
 												 <input type="hidden" name="hid" value="<?php echo $rw->hid; ?>"/>
 												 <input type="hidden" name="kdjab" value="<?php echo $rw->kdjab; ?>"/>
 												 <table class="table table-striped table-bordered">
@@ -111,7 +119,7 @@
 															<?php
 																$n=0;
 																
-																$cn2=$this->db->query("SELECT a.*,b.butir_kegiatan,b.output,(SELECT total_nilai FROM dupak_penilai WHERE dupak_id=a.hid AND penilai_id='$penilaiid' )ttlpenilai FROM dupak a JOIN kamus_kegiatan b ON a.kegiatan_id=b.hid WHERE pemohon_id=".$this->db->escape($rw->hid)." AND kategori='Utama' ORDER BY a.hid");
+																$cn2=$this->db->query("SELECT a.*,b.butir_kegiatan,b.output,(SELECT total_nilai FROM dupak_penilai WHERE dupak_id=a.hid AND penilai_id='$penilaiid' ) ttlpenilai FROM dupak a JOIN kamus_kegiatan b ON a.kegiatan_id=b.hid WHERE pemohon_id=".$this->db->escape($rw->hid)." AND kategori='Utama' ORDER BY a.hid");
 																foreach ($cn2->result() as $rw2){
 																	$n++;
 																	echo '<tr>';
@@ -242,11 +250,11 @@ ROUND(SUM(total_nilai),3) total
     <script>
 	$(function () {
 		$("#btnkirim").on("click", function(e) {
-		var hid = $(this).data("id");
-		e.preventDefault();
+			var hid = $(this).data("id");
+			e.preventDefault();
 		
 		
-		swal({
+			swal({
 				title: 'Yakin akan SELESAIKAN PENILAIAN ?',
 				text: "DUPAK yang sudah dinilai akan terbaca di daftar pleno.",
 				type: 'warning',
@@ -285,7 +293,43 @@ ROUND(SUM(total_nilai),3) total
 				})
 				}
 			});
-	})
+		})
+		$("#btnkirim2").on("click", function(e) {
+			var hid = $(this).data("id");
+			e.preventDefault();
+		
+		
+			swal({
+				title: 'Yakin akan SIMPAN & KIRIM REVISI KE PEGAWAI ?',
+				text: "DUPAK akan dikirim ke Pegawai untuk direvisi.",
+				type: 'warning',
+				buttons: {
+					cancel: {
+						visible: true,
+						text: 'Batal',
+						className: 'btn btn-danger'
+					},
+					confirm: {
+						text: 'Ya',
+						className: 'btn btn-success'
+					}
+				}
+			}).then((willDelete) => {
+				if (willDelete) {
+					$('#preloader-active').show();
+					$.ajax({
+					url: "<?php echo base_url(); ?>penilai/revisidupak",
+					data: "hid=" + hid,
+					cache: false,
+					method: 'post',
+					success: function(data) {
+						$('#preloader-active').hide();
+						window.location.href = "<?php echo base_url();?>penilai/ongoing";
+					}
+				})
+				}
+			});
+		})
 	})
 	</script>
 

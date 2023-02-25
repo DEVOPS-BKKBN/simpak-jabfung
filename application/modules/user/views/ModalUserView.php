@@ -54,7 +54,7 @@
 		<div class="col-md-12"><h4><?php echo $rw->butir_kegiatan; ?></h4></div>
 		<div class="col-md-12">
 			<div class="form-group">
-				<iframe src="<?php if ($rw->dokumen_name=='File') echo base_url().'assets/uploads/dokumen/'.$rw->createdby.'/'.$rw->periode_hid.'/'.$rw->file_name; else echo $rw->file_name; ?>" style="width:100%;border:0px;min-height: 450px"></iframe>
+				<iframe src="<?php if ($rw->dokumen_name=='File') echo base_url().'assets/uploads/dokumen/'.$rw->createdby.'/'.$rw->periode_hid.'/'.$rw->file_name.'?time='.date("YmdHis"); else echo $rw->file_name; ?>" style="width:100%;border:0px;min-height: 450px"></iframe>
 				
 			</div>
 		</div>

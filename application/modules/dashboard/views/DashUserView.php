@@ -24,6 +24,8 @@
 				WHEN 4 THEN 'Sudah Dinilai'
 				WHEN 5 THEN 'Pleno'
 				WHEN 6 THEN 'Selesai'
+				WHEN 7 THEN 'Direvisi Penilai'
+				WHEN 8 THEN 'Perbaikan Revisi oleh User'
 				ELSE ''
 			END status FROM pemohon b WHERE a.hid=b.periode_hid AND nip='".$this->session->userdata('userName')."') status,
 			(SELECT status FROM pemohon b WHERE a.hid=b.periode_hid AND nip='".$this->session->userdata('userName')."') statusid,
@@ -56,15 +58,15 @@
 						<span class="step-name">Sudah ada Penilai</span>
 						<span class="visuallyhidden">Step </span><span class="step-num">3</span>
 					</li>
-					<li class="<?php if ($rw['statusid']>=4) echo 'active-step'; ?>">
+					<li class="<?php if ($rw['statusid']>=4 && ($rw['statusid']!=7 && $rw['statusid']!=8)) echo 'active-step'; ?>">
 						<span class="step-name">Sudah Dinilai</span>
 						<span class="visuallyhidden">Step </span><span class="step-num">4</span>
 					</li>
-					<li class="<?php if ($rw['statusid']>=5) echo 'active-step'; ?>">
+					<li class="<?php if ($rw['statusid']>=5 && ($rw['statusid']!=7 && $rw['statusid']!=8)) echo 'active-step'; ?>">
 						<span class="step-name">Masuk Pleno</span>
 						<span class="visuallyhidden">Step </span><span class="step-num">5</span>
 					</li>
-					<li class="<?php if ($rw['statusid']==6) echo 'active-step'; ?>">
+					<li class="<?php if ($rw['statusid']==6 ) echo 'active-step'; ?>">
 						<span class="step-name">Selesai</span>
 						<span class="visuallyhidden">Step </span><span class="step-num">6</span>
 					</li>

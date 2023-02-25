@@ -336,6 +336,40 @@ class User extends MX_Controller
 			echo "Dokumen fisik yang diupload belum lengkap.\nDokumen Fisik terupload : ".($totalup*1)." dari ".$totaldok;
 		}
 	}
+	public function kirimrevisidupak(){
+		$sql="SELECT a.*,CONCAT(DATE_FORMAT(startdate,'%d %b %Y'),' s.d ',DATE_FORMAT(enddate,'%d %b %Y')) periode 
+		FROM pemohon a JOIN periode b ON a.periode_hid=b.hid WHERE a.hid='".$this->input->post('hid')."'";
+		//echo $sql;
+		$cn=$this->db->query($sql);
+		$rw=$cn->row();
+		
+	
+			$sql="UPDATE pemohon SET status='8',updateddate=NOW(),updatedby='".$this->session->userdata('userName')."' WHERE hid='".$this->input->post('hid')."' AND nip='".$this->session->userdata('userName')."'";
+			$save=$this->db->query($sql);
+						
+			$this->ReferensiModel->insert_logs($this->session->userdata('userName'),'create','kirim revisi dupak',$this->input->post('hid'),'pemohon');
+			$this->session->set_flashdata('response','<div class="alert alert-success m-t-40">Data REVISI berhasil dikirim ke ADMIN SEKRETARIAT. </div>'); 
+		
+			// kirim notifikasi ke penilai yang merevisi
+			$sql="SELECT DISTINCT nip Username FROM dupak_penilai a JOIN dupak b ON a.dupak_id=b.hid JOIN penilai p ON a.penilai_id=p.hid WHERE pemohon_id='".$this->input->post('hid')."' AND a.status='3';";
+			$cn2 = $this->db->query($sql);
+			foreach ($cn2->result() as $rw2){
+					
+				$isinotifikasi='Tanggal '.date("d-m-Y H:i:s").'
+								<br>REVISI Permohonan / Usulan PAK
+								<br>Nomor PAK : '.$this->ReferensiModel->NomorDUPAK($rw->hid).'
+								<br>Periode PAK : '.$rw->periode.'
+								<br>NIP, Nama Pegawai : '.$rw->nip.','.$rw->namalengkap.'
+								<br>Selanjutnya : <a href="'.base_url().'penilai/penilaian?hid='.md5(TOKEN_DOP.$rw->hid).'">Penilaian Revisi</a>
+								<br>Terima Kasih';
+								
+					//send_notifikasi($mailfrom,$sbj,$msg,$sendto,$username)				
+					$this->ProsesModel->send_notifikasi('auto reply','REVISI Permohonan / Usulan PAK : '.$rw->namalengkap,$isinotifikasi,$rw2->Username,$this->session->userdata('userName'));
+
+			}
+		
+		
+	}
 	public function simpandupak(){
 		
 		//var_dump($_POST);exit();

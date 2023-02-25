@@ -40,6 +40,7 @@ WHERE b.hid IN(SELECT hid FROM jabatan WHERE kode_jab='".$rw->kdjab."' AND delet
                     <div class="tab-pane fade active show" id="pills-home-icon" role="tabpanel" aria-labelledby="pills-home-tab-icon">
                         <div class="table-responsive">
 							<?php if ($status==1 && $num>0){ ?><button type="button" class="btn btn-sm waves-effect waves-light btn-info mb-4 mt-4" id="btnkirim" data-id="<?php echo $rw->hid; ?>">KIRIM KE ADMIN SEKRETARIAT</button><?php } ?>
+							<?php if ($status==7 && $num>0){ ?><button type="button" class="btn btn-sm waves-effect waves-light btn-warning mb-4 mt-4" id="btnkirim2" data-id="<?php echo $rw->hid; ?>">KIRIM REVISI KE ADMIN SEKRETARIAT</button><?php } ?>
                                     <table class="table table-striped">
                                         <tbody>
                                             <tr>
@@ -123,6 +124,7 @@ WHERE b.hid IN(SELECT hid FROM jabatan WHERE kode_jab='".$rw->kdjab."' AND delet
 										 <form id="form1" name="form1" action="<?php echo base_url(); ?>user/simpandupak" method="post">
 										 <?php if ($status==1){ ?><button type="button" class="btn waves-effect waves-light btn-info btn-sm mb-4" id="btnkirim" data-id="<?php echo $rw->hid; ?>">KIRIM KE ADMIN SEKRETARIAT</button><?php } ?>
 										 <?php if ($status==1){ ?><a href="<?php echo base_url(); ?>user/modal?action=butirkegiatan&phid=<?php echo $this->input->get('hid');?>" class="btn waves-effect waves-light btn-primary btn-sm mb-4 ls-modal">TAMBAH BUTIR KEGIATAN</a><?php } ?>
+										<?php if ($status==7 && $num>0){ ?><button type="button" class="btn btn-sm waves-effect waves-light btn-warning mb-4 mt-4" id="btnkirim2" data-id="<?php echo $rw->hid; ?>">KIRIM REVISI KE ADMIN SEKRETARIAT</button><?php } ?>
 										
 										 <input type="hidden" name="hid" value="<?php echo $rw->hid; ?>"/>
 										 <input type="hidden" name="kdjab" value="<?php echo $rw->kdjab; ?>"/>
@@ -166,7 +168,17 @@ WHERE b.hid IN(SELECT hid FROM jabatan WHERE kode_jab='".$rw->kdjab."' AND delet
 																		if ($rw3->filename!='') echo '<li class="list-group-item d-flex justify-content-between align-items-center list-group-item-success">'.$rw3->output;
 																			else echo '<li class="list-group-item d-flex justify-content-between align-items-center">'.$rw3->output;
 																		if ($rw3->filename!='') echo '<a href="'.base_url().'user/modal?action=viewdokumen&hid='.$rw3->hid.'&phid='.$phid.'" class="ls-modal"><span class="badge badge-info badge-pill ml-2"><i class="ti-zoom-in text"></i> LIHAT</span></a>';
-																		if ($status==1) echo '<a href="" class="dokumen" data-hid="'.$rw2->hid.'" data-dokid="'.$rw3->hid.'"><span class="badge badge-primary badge-pill ml-2"><i class="ti-export text" aria-hidden="true"></i> UPLOAD</span></a></li>';
+																		
+																		// jika revisi
+																		$notesrevisi="";
+																		if ($status==7){
+																			$dupakid=$this->ReferensiModel->LoadSQL("SELECT hid judul FROM dupak WHERE kegiatan_id='".$rw2->kegiatan_id."' AND pemohon_id='".$rw->hid."'");
+																			$sql="SELECT GROUP_CONCAT(CONCAT(notes,', Tgl Maksimal Revisi : ',DATE_FORMAT(maxrev_date,'%d-%m-%Y')) separator '<br>') judul FROM dupak_penilai a JOIN dupak b ON a.dupak_id=b.hid WHERE dupak_id='$dupakid' AND a.status='3'";
+																			$notesrevisi=$this->ReferensiModel->LoadSQL($sql);
+																		}
+																		
+																		if ($status==1 || ($status==7 && $notesrevisi!="")) echo '<a href="" class="dokumen" data-hid="'.$rw2->hid.'" data-dokid="'.$rw3->hid.'"><span class="badge badge-primary badge-pill ml-2"><i class="ti-export text" aria-hidden="true"></i> UPLOAD</span></a></li>';
+																		if ($status==7 && $notesrevisi!="") echo '<li class="list-group-item d-flex justify-content-between align-items-center list-group-item-danger"><small>'.$notesrevisi.'</small></li>';
 																	}
 															echo '</ul></td>';
 															if ($status==1){
@@ -212,7 +224,17 @@ WHERE b.hid IN(SELECT hid FROM jabatan WHERE kode_jab='".$rw->kdjab."' AND delet
 																		if ($rw3->filename!='') echo '<li class="list-group-item d-flex justify-content-between align-items-center list-group-item-success">'.$rw3->output;
 																			else echo '<li class="list-group-item d-flex justify-content-between align-items-center">'.$rw3->output;
 																		if ($rw3->filename!='') echo '<a href="'.base_url().'user/modal?action=viewdokumen&hid='.$rw3->hid.'&phid='.$phid.'" class="ls-modal"><span class="badge badge-info badge-pill ml-2"><i class="ti-zoom-in text"></i> LIHAT</span></a>';
-																		if ($status==1) echo '<a href="" class="dokumen" data-hid="'.$rw2->hid.'" data-dokid="'.$rw3->hid.'"><span class="badge badge-primary badge-pill ml-2"><i class="ti-export text" aria-hidden="true"></i> UPLOAD</span></a></li>';
+																		
+																		// jika revisi
+																		$notesrevisi="";
+																		if ($status==7){
+																			$dupakid=$this->ReferensiModel->LoadSQL("SELECT hid judul FROM dupak WHERE kegiatan_id='".$rw2->kegiatan_id."' AND pemohon_id='".$rw->hid."'");
+																			$sql="SELECT GROUP_CONCAT(CONCAT(notes,', Tgl Maksimal Revisi : ',DATE_FORMAT(maxrev_date,'%d-%m-%Y')) separator '<br>') judul FROM dupak_penilai a JOIN dupak b ON a.dupak_id=b.hid WHERE dupak_id='$dupakid' AND a.status='3'";
+																			$notesrevisi=$this->ReferensiModel->LoadSQL($sql);
+																		}
+																		
+																		if ($status==1 || ($status==7 && $notesrevisi!="")) echo '<a href="" class="dokumen" data-hid="'.$rw2->hid.'" data-dokid="'.$rw3->hid.'"><span class="badge badge-primary badge-pill ml-2"><i class="ti-export text" aria-hidden="true"></i> UPLOAD</span></a></li>';
+																		if ($status==7 && $notesrevisi!="") echo '<li class="list-group-item d-flex justify-content-between align-items-center list-group-item-danger"><small>'.$notesrevisi.'</small></li>';
 																	}
 															echo '</ul></td>';
 															if ($status==1){
@@ -317,6 +339,42 @@ $(function () {
 								confirmButtonClass: 'btn btn-lg btn-danger'
 							});
 						}else location.reload();
+					}
+				})
+				}
+			});
+	})
+	$("#btnkirim2").on("click", function(e) {
+		var hid = $(this).data("id");
+		e.preventDefault();
+		
+		
+		swal({
+				title: 'Yakin akan kirim REVISI ke ADMIN SEKRETARIAT ?',
+				text: "Pastikan semua data dan dokumen yang diperlukan sudah di lengkapi karena data tidak akan bisa dirubah lagi.",
+				type: 'warning',
+				buttons: {
+					cancel: {
+						visible: true,
+						text: 'Batal',
+						className: 'btn btn-danger'
+					},
+					confirm: {
+						text: 'Ya',
+						className: 'btn btn-success'
+					}
+				}
+			}).then((willDelete) => {
+				if (willDelete) {
+					$('#preloader-active').show();
+					$.ajax({
+					url: "<?php echo base_url(); ?>user/kirimrevisidupak",
+					data: "hid=" + hid,
+					cache: false,
+					method: 'post',
+					success: function(data) {
+						$('#preloader-active').hide();
+						location.reload();
 					}
 				})
 				}

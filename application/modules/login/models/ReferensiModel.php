@@ -297,6 +297,8 @@ class ReferensiModel extends CI_Model {
 		elseif($id==4) $status='Sudah Dinilai';
 		elseif($id==5) $status='Masuk Pleno';
 		elseif($id==6) $status='Sudah Tanda Tangan';
+		elseif($id==7) $status='Direvisi Penilai';
+		elseif($id==8) $status='Perbaikan Revisi oleh User';
 		else $status='';
 		return $status;
 	}
